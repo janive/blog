@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+	<meta name="generator" content="Hugo 0.91.2" />
+
+  <title>
+      
+      Jan Iversen
+      
+  </title>
+
+</head>
+
+
+  <body>
+
+    
+
+	
+<div class="h-feed">
+
+	
+	
+	  <div class="h-entry">
+		
+
+		<a href="https://jan-iversen.de/2025/09/25/erstmal-kaffee-was-ist-das.html" class="u-url"><time class="dt-published" datetime="2025-09-25 06:56:53 &#43;0200">Sep 25, 2025</time></a>
+
+		<div class="e-content">
+			 <p>Erstmal Kaffee&hellip;.</p>
+<p>Was ist das für ein Einhorn? Das ist das Orgmode-Logo.</p>
+<img src="uploads/2025/image.jpg" width="450" height="600" alt="">
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
+			<h1><a href="https://jan-iversen.de/2025/09/24/orgroamui-oder-wie-wurde-die.html">Org-Roam-UI... oder: Wie wurde die Notizvorschau repariert.</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2025/09/24/orgroamui-oder-wie-wurde-die.html" class="u-url"><time class="dt-published" datetime="2025-09-24 19:47:58 &#43;0200">Sep 24, 2025</time></a>
+
+		<div class="e-content">
+			 <p>Ich benutze Emacs. Unter anderem verwende ich es für die Planung, Vorbereitung und Nachbereitung meiner Pen&amp;Paper-Runde “Fluch des Strahd”. Diese Kampagne hat eine hohe Komplexität. Es gibt viele Non-Player-Charakters (NPC), Orte, Ereignisse und Geheimnisse, die mit einander zusammenhängen. Das Buch der Kampagne ist leider nicht besonders gut strukturiert. Beim ersten Lesen ist mir bereits aufgefallen, dass sehr viele Informationen z. B. zu NPCs über das gesamte Buch verstreut sind. Als Spielleiter benötige ich aber alle Informationen gebündelt. Nur so kann ich gezielt Hinweise einstreuen, die wichtig sind. Meine Aufgabe ist es, die Gruppe grundsätzlich einen Rahmen zu geben, in dem sie sich bewegen können. Und sie sollten auch genug Informationen haben, damit sie Entscheidungen treffen können. Ich weiß, dass kann kontrovers gesehen werden (Railroad vs. Sandbox…), aber so ist mein Stil. Und bisher scheinen meine Mitspieler das zu mögen.</p>
+<p>Nun zu Emacs und meinen Vorbereitungen. Ich lese also die Kampagne und will für mich selber die Informationen festhalten. Außerdem möchte ich sie auch miteinder verknüpfen. Kurz geschrieben: ich will ein eigenes Wiki aufbauen. Dazu gibt es für Emacs das Paket Org-roam (<a href="https://www.orgroam.com/">Homepage</a>). Org-Roam erstellt Notizen mit Metainformationen. Zusätzlich legt es eine Datenbank an, in der Verlinkungen und einige weitere Meta-Informationen enthalten sind. Soweit, so gut.</p>
+<p>Nun möchte ich aber für die Kampagne in Org-Roam einen eigenen Bereich mit Notizen haben. Es soll getrennt von anderen Notizen sein. Org-Roam kann das grundsätzlich. Es gibt aber ein zusätzliches Modul Org-Roam-UI. Dies kann die Vernetzungen im Browser abbilden. Es ist interaktiv, kann die Notizen anzeigen und sogar auf Emacs reagieren. Verwendet man, wie ich, einen zusätzliche, separierten Ort für die Notizen, funktioniert die Ansicht der Notizen nicht. Man kann zwar das Netzwerk im Browser sehen, aber der Inhalt einer Notiz wird mit einem HTTP-Fehler beantwortet. Der Fehler wird in diesem <a href="https://github.com/org-roam/org-roam-ui/issues/236">Github-Issue</a> beschrieben.</p>
+<p>Ich bin kein Entwickler. Und kann die vermeintliche Lösung nicht bei mir umsetzen. Aber ich arbeite in einer Softwarefirma. Und ein sehr geschätzer Kollege ist Softwareentwickler und verwendet ebenfalls Emacs und kann sogar Lisp. Also habe ich ihn gefragt, ob er mir nicht helfen kann. Und er hat für mich folgende Lösung implementiert. Vielen lieben Dank an dieser Stelle für die Hilfe.</p>
+<p>Vielleicht hilft sie jemand anderen.</p>
+<p>In Doom-Emacs muss dieser Code in der <code>config.el</code> ergänzt werden. Danach dann den Sync in Doom ausführen und die Anzeige der Notizen funktioniert.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-lisp" data-lang="lisp">    <span style="color:#75715e">;; Fix für Org-Roam-UI</span>
+    (defvar jan/org-roam-ui--roam-directory <span style="color:#66d9ef">nil</span>)
+    
+    (defun jan/org-roam-ui--advice-set-dir (fun <span style="color:#66d9ef">&amp;rest</span> args)
+      (<span style="color:#66d9ef">let</span> ((old-value org-roam-directory))
+        (<span style="color:#66d9ef">setq</span> org-roam-directory jan/org-roam-ui--roam-directory)
+        (prog1
+            (<span style="color:#a6e22e">apply</span> fun args)
+          (<span style="color:#66d9ef">setq</span> org-roam-directory old-value))))
+    
+    (advice-add <span style="color:#e6db74">&#39;httpd/node</span> <span style="color:#e6db74">:around</span> <span style="color:#e6db74">&#39;jan/org-roam-ui--advice-set-dir</span>)
+    (advice-add <span style="color:#e6db74">&#39;httpd/img</span> <span style="color:#e6db74">:around</span> <span style="color:#e6db74">&#39;jan/org-roam-ui--advice-set-dir</span>)
+    
+    (defun jan/org-roam-ui--save-dir (<span style="color:#66d9ef">&amp;rest</span> args)
+      (when org-roam-ui-mode
+        (<span style="color:#66d9ef">setq</span> jan/org-roam-ui--roam-directory org-roam-directory)))
+    
+    (advice-add <span style="color:#e6db74">&#39;org-roam-ui-mode</span> <span style="color:#e6db74">:after</span> <span style="color:#e6db74">&#39;jan/org-roam-ui--save-dir</span>)
+</code></pre></div><h1 id="beispielvorschau-im-browser-spoiler">Beispielvorschau im Browser (Spoiler)</h1>
+<details>
+  <summary>⚠️ Achtung Spoiler: Klicke hier, um das Bild anzuzeigen</summary>
+<p><img src="https://jan-iversen.de/uploads/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
+</details>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
+			<h1><a href="https://jan-iversen.de/2025/09/22/warum-benutze-ich-emacs.html">Warum benutze ich Emacs?</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2025/09/22/warum-benutze-ich-emacs.html" class="u-url"><time class="dt-published" datetime="2025-09-22 18:34:59 &#43;0200">Sep 22, 2025</time></a>
+
+		<div class="e-content">
+			 <p>Heute möchte ich ein wenig über Emacs schreiben. Für mich ist Emacs mittlerweile ein sehr wichtiges Werkzeug in meiner persönlichen aber auch beruflichen Organisation geworden. Im folgenden werde ich kurz beschreiben, wie ich als Nichtentwickler Emacs für mein Wissens- und Projektmanagement verwende? Wie nutze ich Emacs im Beruf und Privat?</p>
+<p>Aber vielleicht sollten wir zuerst klären: Was ist Emacs?</p>
+<h1 id="was-ist-eigentlich-emacs">Was ist eigentlich Emacs?</h1>
+<p>Ich glaube, auf diese Frage gibt es eigentlich keine wirkliche Antwort. Schaue ich in die Wikipedia, dann wird Emacs als Texteditor definiert. Auch die Homepage des GNU Emacs-Projekt beschreibt Emacs als “freien, erweiterbaren und konfigurierbaren Texteditor und mehr”. Dieses “und mehr” ist der gemeine Teil der Beschreibung.
+Nach meiner bisherigen Erfahrung mit Emacs würde ich folgende Definition nennen:
+“Emacs ist eine vielfach verwendbare, anpassbare und freie Plattform mit diversen Textmanipulationsmöglichkeiten sowie Anwendungsprogrammen.” Klingt irgendwie etwas sperrig. Man kann in Emacs Softwareentwicklung durchführen, man kann damit Projektorganisation durchführen, man kann aber auch darin seine RSS-Feeds lesen, Spiele spielen, Musik hören, im Internet surfen,…. und man kann auch Texte darin schreiben.
+Also bleiben wir vielleicht beim Texteditor… fürs Erste.</p>
+<h1 id="wozu-verwende-ich-emacs">Wozu verwende ich Emacs?</h1>
+<p>Ich bin kein Softwareentwickler. Zwar habe ich früher, also in meinen jungen Jahren, ein wenig Softwareentwicklung gelernt (und damit meine ich Turbo Pascal, etwas C und ganz wenig Assembler), aber ich bin es nicht geworden. Meine Arbeit und auch mein Privatleben besteht zum Großteil daraus, Projekte zu verwalten. Und was gehört dazu? Informationen niederschreiben, Informationen wieder finden, Informationen zu verändert. Also ich muss Wissen managen. Emacs ist das Werkzeug, dass mich dabei unterstützt.</p>
+<h1 id="was-nutze-ich-in-emacs">Was nutze ich in Emacs?</h1>
+<h2 id="welches-emacs-denn">Welches Emacs denn?</h2>
+<p>Jetzt wird es wohl etwas technisch. Ich verwende nicht die Basisversion von GNU Emacs (im folgenden spreche ich von Vanilla). Bei mir läuft auf sämtlichen Computern Doom Emacs (<a href="https://github.com/doomemacs/doomemacs">Homepage von Doom</a>). Das ist eine angepasste, vorkonfigurierte Version von Emacs. Ich habe einige Gründe, warum ich Doom und nicht Vanilla Emacs nutze.</p>
+<ol>
+<li>
+<p>Vanilla Emacs sorgt für Schmerzen in meiner linken Hand.
+Das ist eine gar nicht so untypische Begleiterscheinung, wenn man Emacs verwendet. Die Tastenkombinationen werden über STRG bzw. Alt durchgeführt. Und es gibt sehr, sehr, sehr viele Tastenkombinationen. Ich habe schnell festgestellt, dass ich damit Probleme bekomme.
+Doom konfiguriert Emacs so um, dass es ein modaler Editor ist. Emacs verhält sich dann ähnlich wie VIM. Ich kann viele Tastenkombinationen durch die Leertaste starten. Ich finde die Tastenkombinationen auch für mich logischer und einfacher. Und mir tut die Hand nicht weh. Also -&gt; Doom</p>
+</li>
+<li>
+<p>Doom bringt alles wichtige gleich mit
+Ich muss mich nicht mit der Konfiguration von Emacs zu sehr beschäftigen. Da kann sehr viel Zeit aufgebracht werden, bis Emacs so funktioniert, wie man es gerne haben möchte. Und ich bin kein Softwareentwickler. Die Konfiguration ist in Lisp geschrieben. Der Sprache, in der auch Emacs selbst entwickelt ist. Ich verstehe bedingt den Code. Aber wenn etwas nicht funktioniert, dann bin ich meistens aufgeschmissen.</p>
+<blockquote>
+<p>Fun Fact: LLMs wie Gemini können bei Problemen mit Emacs so gut wie gar nicht helfen. Fast alle Antworten, die ich von Google Gemini erhalte, sind ausgedacht. Es ist erschreckend schlecht.</p>
+</blockquote>
+</li>
+<li>
+<p>Doom sieht gut aus
+Ja…. es ist ein Texteditor. Aber Doom sieht wirklich gut aus. Da musste ich nicht viel ändern. Außer ein anderes Themes und eine angepasste Schrift, passt es.</p>
+</li>
+</ol>
+<p>Es gibt noch mehr Gründe für Doom Emacs. Aber die drei sind die wesentlichen.</p>
+<h2 id="pakete-funktionen-komm-auf-den-punkt">Pakete, Funktionen??? Komm auf den Punkt.</h2>
+<h3 id="mein-fundament-orgmode">Mein Fundament: Orgmode</h3>
+<p>Ja… was benutze ich nun. Der wichtigste Grund für mich…. Orgmode. Ganz klar. Der Orgmode ist genial. Ich kann gar nicht sagen, wie viel Spaß es mir macht, ein Meetingprotokoll im Orgmode zu schreiben. Oder z. B. diesen Blogeintrag… ich schreibe das gerade in Emacs im Orgmode. Und exportiere dann den Inhalt in Markdown. Das kann Emacs. Ich kann auch eine Latex- oder PDF-Datei erzeugen. Cool, oder? Ich verwende insbesondere beruflich auch viel die Agenda sowie die TODO-Verwaltung. Orgmode ist wie ein Werkzeugkasten mit wirklich sehr viel und gutem Werkzeug. Ich muss nur für mich selber entscheiden, was ich denn mit dem Werkzeugkasten genau machen möchte.</p>
+<h3 id="notizenverwaltung-leicht-gemacht-denote">Notizenverwaltung leicht gemacht: Denote</h3>
+<p>Denote (<a href="https://protesilaos.com/emacs/denote">Handbuch</a>) ist ein sehr bekanntes Paket von Protesilaos Stavrou (auch bekannt als Prot). Damit kann ich meine Notizen super verwalten. Dieser Blogeintrag ist auch eine Denote-Notiz. Ich mag den Ansatz, dass die gesamte Verwaltung über den Dateinamen in Verbindung des Frontmatter durchgeführt wird. Wirklich geniale Idee. Im Beruf stelle ich immer mehr auf Denote um. Projekte, Meetingmitschriften, normale Notizen verwalte ich nahezu komplett über Denote. Ich kann schnell etwas finden. Es ist einfach und simpel und dennoch mächtig.</p>
+<h3 id="dd-kampagnen-managen-org-roam">D&amp;D-Kampagnen managen: Org-Roam</h3>
+<p>Jetzt wird es richtig abgefahren. Ich leite aktuell zwei Dungeons and Dragons-Runden. Dafür benötige ich auch viele Notizen. Und die Notizen müssen unter einander verlinkt sein. So gibt es z. B. NPCs, Orte, Ereignisse und Sessions. Wenn also in einer Session zwei NPCs eine Rolle spielen und diese sich an einem Ort befinden, verlinke ich von der Notiz für die Session zu den entsprechenden anderen Notizen. Org-Roam bietet dafür sehr gute Funtionen an. Ich kann auch z. B. in einer Notiz sehen, welche Backlinks es gibt. Also welche anderen Notizen verweisen auf diese Notiz. Mit einem Plugin kann ich dieses Wissensnetz visualisieren. Mir hilft es ungemein, so meine Kampagnen zu verwalten. Wobei… ich aktuell nur eine der beiden Kampagnen über Org-Roam und Emacs verwalte. Die andere läuft weiterhin in meinem Obsidian. Das ist der letzte Anwendungsfall bei mir für Obsidian (aber Obsidian ist auch genial… ich mag Emacs nur lieber).</p>
+<h3 id="was-nutze-ich-sonst">Was nutze ich sonst?</h3>
+<p>Nun… eigentlich nur eine Sache… alle Dateien, egal ob Denote oder Org-Roam oder normale Texte sind bei mir alle im Orgmode-Format abgelegt. Es sind also normale Textdateien, die mit Markupinformationen angereichert sind. So kann ich sie mir dann auch auf dem Smartphone zum Beispiel anschauen. Ein normaler Texteditor reicht schon, dann kann ich den Inhalt lesen.</p>
+<h1 id="warum-emacs-und-nicht-programm-x-y-oder-z">Warum Emacs und nicht Programm X, Y oder Z?</h1>
+<p>Ich habe schon kurz Obsidian erwähnt. Obsidian ist genial. Und ich habe es längere Zeit genutzt (ca. zwei Jahre). Mir hat in Obsidian eine gute Möglichkeit der Aufgabenverwaltung gefehlt. Und es gibt keinen wirklichen Kalender. Außerdem… Emacs ist schon wirklich nerdig. Es ist total anders als sämtliche anderen Programme. Das hat mich schon immer gereizt. Im Prinzip… der Orgmode war dann das endgültige Argument. Die Möglichkeit Textpassagen einfach ein- oder auzuklappen, ist genial. Todos sind einfach verwaltet. Für mich funktioniert Emacs einfach gut (unter Linux ist es super, Windows ist gut… könnte gerne etwas schneller sein).</p>
+<h1 id="ist-emacs-etwas-für-dich">Ist Emacs etwas für dich?</h1>
+<p>Emacs hat eine steile Lernkurve. Und ich werde niemals am Ende der Lernkurve ankommen. Aber ich glaube, Emacs belohnt mich auch. Ich lerne immer wieder eine neue Funktion dazu. Und freue mich über all die Kleinigkeiten, die einfach funktionieren und mir Arbeit abnehmen.
+Also stell dir vielleicht diese beiden Fragen.</p>
+<ol>
+<li>Willst du etwas völlig Neues lernen?</li>
+<li>Kannst und willst du dafür einiges an Zeit aufbringen?</li>
+</ol>
+<p>Wenn du beide Fragen mit Ja beantwortest… dann schau dir doch Emacs mal an. Prot hat einige gute Videos. Schau dir auch vielleicht ein Video zum Orgmode an. Und dann verspürst du auch den Drang ein Programm kennenzulernen, welches so anders ist.</p>
+<p><img src="https://jan-iversen.de/uploads/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
+			<h1><a href="https://jan-iversen.de/2025/09/21/ein-gestndnis-ich-bin-distrohopper.html">Ein Geständnis: Ich bin Distrohopper</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2025/09/21/ein-gestndnis-ich-bin-distrohopper.html" class="u-url"><time class="dt-published" datetime="2025-09-21 08:03:04 &#43;0200">Sep 21, 2025</time></a>
+
+		<div class="e-content">
+			 <h1 id="was-ist-distrohopping">Was ist Distrohopping?</h1>
+<p>Ich habe hier einfach mal Kagi (meine Suchmaschine der Wahl) nach einer Definition gefragt.</p>
+<blockquote>
+<p>Distrohopping bezeichnet das Ausprobieren und Wechseln zwischen verschiedenen Linux-Distributionen (kurz: Distros) oder anderen Betriebssystemen.</p>
+<p>Es ist ein Hobby für viele Nutzer, die sich für freie Software interessieren und die Vielfalt und Flexibilität von Betriebssystemen erkunden möchten.</p>
+</blockquote>
+<p>Diese Beschreibung trifft es sehr gut. Im Endeffekt installiert jemand, der zwischen den Distros hin- und herwechselt immer wieder sein System neu. Das kann zum Teil sehr oft geschehen.</p>
+<h1 id="warum-mache-ich-es">Warum mache ich es?</h1>
+<p>Es gibt verschiedene Gründe für das Distrohopping. Bevor ich verrate, warum ich es mache, zähle ich vier mögliche Gründe auf:</p>
+<ol>
+<li>Erkundung und Lernen
+Der Nutzer möchte einfach möglichst viele verschiedene Distributionen kennenlernen.</li>
+<li>Suche nach perfekter Passform
+Irgendetwas an der aktuellen Distribution stört den Nutzer. Er sucht das perfekte System und wechselt daher auf eine andere Distro.</li>
+<li>Zeitvertreib
+Es kann einfach Spaß machen, sich etwas neues anzuschauen</li>
+<li>Ungelöste Fehler
+Das ist die schlimmere Variante von 2. Der Nutzer hat in einer Distribution einen Bug, den er nicht beheben kann.</li>
+</ol>
+<p>Nun zu mir…. Ich distrohoppe wirklich viel. Meine Partnerin lacht immer schon, wenn ich ihr den aktuellen Namen der Distribution sage und um einen neuen Sticker bitte (Sie hat einen Plotter und kann fantastische Sticker damit herstellen). Bei mir ist es eine Art Drang zu wechseln. Ich nutze eine Distribution für einen gewissen Zeitraum und verspüre dann irgendwann Langeweile. Das kann manchmal schon nach einem Tag eintreten. Oder zwei Wochen oder einem Monat.</p>
+<p>Ein anderer Grund, der mich auch gerne erwischt: Featuritis. Insbesondere Rolling-Release-Distributionen sind hier für mich gefährlich. Die neueste Version von Gnome? Oh… neuer Mesa-Treiber? Die neueste Emacs-Version? Ich will das haben. Aber so eine Distribution dann pflegen? Regelmäßig Updates installieren? Evtl. neue Bugs fixen oder abwarten bis sie gelöst sind? Das möchte ich eigentlich auch nicht. Aber manchmal irgendwie auch.</p>
+<p>Linux ist für mich wohl einfach zu langweilig geworden. Selbst Distributionen wie Arch oder openSUSE Tumbleweed funktionieren gut bis sehr gut. Und dann schaue ich zu Ubuntu oder Fedora und denke: hey, die sehen auch spannend aus. Die haben doch gerade auch eine neue Version veröffentlicht. Wie ist die denn so?</p>
+<p>Es ist vielleicht nicht für jeden nachvollziehbar. Ehrlich gesagt, verstehe ich es manchmal selbst nicht.  Aber eigentlich ist es nicht schlimm. Denn mir macht es Spaß und ich freue mich immer ein wenig über den Tellerrand zu schauen.</p>
+<h1 id="wie-kann-ich-davon-wegkommen">Wie kann ich davon wegkommen?</h1>
+<p>Nun habe ich gerade geschrieben, dass mir Distrohopping Spaß macht. Und es nicht schlimm ist. Warum möchte ich dann eigentlich davon wegkommen? Ich bin recht gut darin, das System neu aufzusetzen. Meine Daten liegen alle auf einer NAS. Aber dennoch habe ich dann jedes Mal den zeitlichen Aufwand das System einzurichten. Programme installieren, Konfigurationen wiederherstellen, Spiele herunterladen, … Ich sollte meine beiden Computer vielleicht einfach mal nutzen, oder?</p>
+<p>Ich habe aktuell sowohl auf meinem Laptop Ubuntu installiert. Auf dem PC die aktuell 25.04 (Plucky Puffin) und auf dem Laptop die Beta von 25.10 (Questing Quokka). Und ich setze mir jetzt selbst eine Challenge. Ich werde bis Ende Oktober diese Distribution nicht verlassen. Mal schauen, wie es läuft und wie stark ich dem Drang neu zu installieren widerstehen kann.</p>
+
+		</div>
+	  </div>
+	
+
+</div>
+
+
+    
+    
+
+  </body>
+
+</html>
