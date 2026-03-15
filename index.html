@@ -24,6 +24,49 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html">Thinkpad und Kernelpanics... wenn es zu modern ist... knallt es eben.</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html" class="u-url"><time class="dt-published" datetime="2026-03-15 16:17:42 &#43;0100">Mar 15, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Seit Monaten suche ich ja schon eine Lösung für die Kernelpanics auf meinem Thinkpad. Heute hatte ich den Durchbruch.</p>
+<h1 id="kurzer-blick-zurück">Kurzer Blick zurück</h1>
+<p>Ich habe ein Thinkpad Gen 5 AMD. Darin ist eine Wifi-7-Karte verbaut. Ich habe ebenfalls eine Fritzbox, die bereits Wifi-7-fähig ist. Seit dem Kernel 6.18 wird beim Aufwachen aus dem Standby reproduzierbar eine Kernel Panic ausgelöst. Seit dem Kernel 6.19 läuft auch die WLAN-Verbindung selber hakelig. Das Gerät verbindet sich immer wieder neu, wechselt zwischen 2,4 GHz und 5 GHz hin und her. Oder baut gar keine Verbindung auf. Ich kann das Verhalten mit diversen Distributionen nachstellen. Das Problem entsteht irgendwo im ath12k-Modul.</p>
+<p>Das war auch der Grund, warum ich jetzt erstmal Ubuntu LTS genutzt habe. Das war die einzige Distribution mit einem stabilen Kernel und Wifi.</p>
+<h1 id="der-heutige-durchbruch">Der heutige Durchbruch</h1>
+<p>Heute habe ich mir gedacht&hellip; egal&hellip; ich kann auf das Thinkpad auch ein wenig verzichten. Ich teste eine Distribution mit aktuellem Kernel und versuche dann, dort im Forum eine entsprechende Meldung zu posten. Vielleicht gibt es dort dann Entwickler, die darauf aufmerksam werden. Denn ich denke, ich bin nicht alleine mit dem Problem.</p>
+<p>Ich habe daher CachyOS (Arch-basiert) installiert. Das war für mich hier das Einfachste. Und ich weiß, dass die Entwickler von CachyOS auch durchaus Richtung Upstream mit Kernelentwicklern kommunizieren.</p>
+<p>Nach der Installation hatte ich, wie erwartet, den Kernelcrash beim Aufwecken aus dem Standby. Ich habe das Gerät erst einmal weiter eingerichtet, aber es lief auch nicht richtig rund. Wifi hing, was sogar zu kurzen Freezes in Gnome geführt hat. Wie sage ich dann immer: &ldquo;Das Gerät lief wie ein Sack Flöhe&rdquo;. In den Logs fand ich dann u. a. diesen Fehler:</p>
+<ul>
+<li><code>ath12k_pci 0000:02:00.0: ML peer 0 exists already, unable to add new entry for [MAC]</code></li>
+<li><code>wlan0: failed to insert STA entry for the AP (error -17)</code></li>
+<li><code>WARNING: drivers/net/wireless/ath/ath12k/mac.c:11932 at ath12k_mac_op_unassign_vif_chanctx</code></li>
+</ul>
+<p>Das sind wohl Fehler, die beim Versuch, das MLO mit dem Router auszuhandeln, entstehen (zumindest nach meiner Recherche&hellip; ich habe da aber wirklich wenig Ahnung). Das ist wohl ein Feature von Wifi 7. Also&hellip; was verliere ich, wenn ich den Router auf Wifi 6 umstelle? Eigentlich nicht viel, da mein Thinkpad eh das einzige Wifi-7-fähige Gerät ist.</p>
+<p>Gesagt, getan&hellip; ich habe die Fritzbox umgestellt. Und eine KI empfahl mir, noch folgende Einstellung im Thinkpad vorzunehmen:</p>
+<p>Mittels <code>sudo nano /etc/modprobe.d/ath12k.conf</code> eine Konfiguration für das ath12k-Modul anlegen und folgenden Inhalt einpflegen:</p>
+<p><code>options ath12k mlo_capable=0</code></p>
+<p>Ob der Parameter wirklich funktioniert, habe ich nicht weiter getestet. Denn&hellip; nachdem ich in der Fritzbox die Änderung durchgeführt und meinen Laptop neu gestartet habe, lief das Gerät perfekt. Ich habe keine Kernel Panic mehr beim Resume. Die Verbindung zu meinem WLAN wird quasi sofort aufgebaut. Es läuft auch alles stabil. Keine kurzen Freezes oder langsamen Übertragungen mehr.</p>
+<p>Ich werde das Problem weiter beobachten. Vielleicht bringt der Kernel 7.0 dann die Verbesserungen und Fixes. Ich werde das Problem auf jeden Fall in den nächsten Tagen im CachyOS-Forum posten. Vielleicht hilft jemandem diese Erkenntnis oder jemand kann bei weiteren Analysen unterstützen.</p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
+
+		<a href="https://jan-iversen.de/2026/03/07/wir-waren-schon-fleiig-und.html" class="u-url"><time class="dt-published" datetime="2026-03-07 11:50:33 &#43;0100">Mar 7, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Wir waren schon fleißig und sind heute morgen spazieren gewesen. Herrliche Luft und der Kopf ist jetzt frei.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 
 		<a href="https://jan-iversen.de/2026/03/07/gestern-habe-ich-noch-die.html" class="u-url"><time class="dt-published" datetime="2026-03-07 05:34:13 &#43;0100">Mar 7, 2026</time></a>
 
@@ -401,7 +444,7 @@ Jetzt ist Debian auf dem neuen Thinkpad soweit eingerichtet, dass ich das Gerät
 
 		<div class="e-content">
 			 <p>Gestern kam das neue Thinkpad an. Ein T15 Gen 5 mit AMD-CPU. Sehr schönes Gerät. Debian lässt sich leider nicht installieren. Während der Erkennung der Netzwerkkarten wird eine Kernel-Panik ausgelöst. Also wurde Arch installiert. Einige Kleinigkeiten müssen noch eingerichtet werden, aber das meiste ist fertig. Und das läuft erste Sahne.</p>
-<p><img src="https://eu.uploads.micro.blog/256866/2025/0a51fdcf0d.jpg" alt="Auto-generated description: Ein Laptop mit einem Neon-Stadtszene-Hintergrund zeigt ein Terminalfenster mit Systeminformationen."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/0a51fdcf0d.jpg" alt="Auto-generated description: Ein Laptop mit einem Neon-Stadtszene-Hintergrund zeigt ein Terminalfenster mit Systeminformationen."></p>
 
 		</div>
 	  </div>
@@ -490,7 +533,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 <p>Unter XFCE mit X11 habe ich all diese Probleme nicht. Vielleicht sind diese Kinderkrankheiten von Wayland dann behoben, wenn XFCE auch Wayland kann.</p>
 <h1 id="vielleicht-doch-mal-etwas-anderes-probieren">Vielleicht doch mal etwas anderes probieren?</h1>
 <p>Aktuell sehe ich keinen Grund, einen anderen Desktop zu installieren. XFCE ist einfach rock solid und für mich der stabile Fels in der hektischen Arch-Welt. Ich warte auf ein neues Thinkpad. Und ich bin ernsthaft am überlegen, ob ich nicht vielleicht Debian darauf installiere. Dann hätte ich wohl die langweiligste Linux-Distribution mit dem langweiligsten Desktop auf dem langweiligsten Notebook. Interessante Idee.</p>
-<p><img src="https://eu.uploads.micro.blog/256866/2025/bildschirmfoto-2025-10-29-19-40-59.png" alt="XFCE-Desktop. Hintergrundbild: Eine nächtliche Szene im Retrowave-Stil zeigt ein Paar, das sich vor einem futuristischen Auto unter einem leuchtenden Vollmond befindet, umgeben von Palmen und Neonlichtern."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/bildschirmfoto-2025-10-29-19-40-59.png" alt="XFCE-Desktop. Hintergrundbild: Eine nächtliche Szene im Retrowave-Stil zeigt ein Paar, das sich vor einem futuristischen Auto unter einem leuchtenden Vollmond befindet, umgeben von Palmen und Neonlichtern."></p>
 
 		</div>
 	  </div>
@@ -834,7 +877,7 @@ Du siehst, irgendwie mache ich in meiner Freizeit etwas sehr ähnliches wie im B
     (advice-add <span style="color:#e6db74">&#39;org-roam-ui-mode</span> <span style="color:#e6db74">:after</span> <span style="color:#e6db74">&#39;jan/org-roam-ui--save-dir</span>)
 </code></pre></div><h1 id="beispielvorschau-im-browser-spoiler">Beispielvorschau im Browser (Spoiler)</h1>
 <!-- raw HTML omitted -->
-<p><img src="https://eu.uploads.micro.blog/256866/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
 <!-- raw HTML omitted -->
 
 		</div>
@@ -898,7 +941,7 @@ Also stell dir vielleicht diese beiden Fragen.</p>
 <li>Kannst und willst du dafür einiges an Zeit aufbringen?</li>
 </ol>
 <p>Wenn du beide Fragen mit Ja beantwortest… dann schau dir doch Emacs mal an. Prot hat einige gute Videos. Schau dir auch vielleicht ein Video zum Orgmode an. Und dann verspürst du auch den Drang ein Programm kennenzulernen, welches so anders ist.</p>
-<p><img src="https://eu.uploads.micro.blog/256866/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
 
 		</div>
 	  </div>
