@@ -24,12 +24,59 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html">Thinkpad läuft jetzt stabil</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html" class="u-url"><time class="dt-published" datetime="2026-03-24 17:17:26 &#43;0100">Mar 24, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Ich hatte bereits von den Stabilitätsproblemen mit meinem Thinkpad und dem Linuxkernel 6.18 bzw. 6.19 in Verbindung mit der WCN785x-WIFI-Karte (Fastconnect 7800) und WIFI 7 berichtet <a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html">https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html</a>. Die Abschaltung von WIFI 7 in meinem Router hat die Probleme beseitigt. Darüber habe ich in meinem Blog hier geschrieben.</p>
+<p>Natürlich möchte ich aber dennoch gerne irgendwann WIFI 7 nutzen können. Meine Hoffnung lag bisher auf dem Kernel 7.0. Durch einen glücklichen Zufall bin ich aber im Arch-Forum auf diesen Thread gestoßen: <a href="https://bbs.archlinux.org/viewtopic.php?id=312624">https://bbs.archlinux.org/viewtopic.php?id=312624</a>
+Der Benutzer dort beschreibt exakt mein Problem. Die Analyse des Arch-Mitglieds Seth ist interessant. Er kann die Logs korrekt interpretieren und führt die Probleme auf <code>wpa_supplicant</code> zurück. Das ist der Dienst, der mit dem WIFI-Router die Verbindung aushandelt (soweit ich es verstehe). Und <code>wpa_supplicant</code> kann bisher nur sehr rudimentär WIFI 7. Diese Tatsache und der Umstand, dass am ath12k-Modul sehr aktiv gearbeitet wurde und wird, scheinen dann zu der Kernelpanic zu führen.
+Ich habe also den Lösungsvorschlag von Seth bei mir umgesetzt.</p>
+<h1 id="lösung">Lösung</h1>
+<p>Es hilft, wenn man <code>wpa_supplicant</code> durch <code>iwd</code> ersetzt. Das funktioniert unter Arch sehr einfach. Im Wiki wird das hier beschrieben: <a href="https://wiki.archlinux.org/title/NetworkManager#Using_iwd_as_the_Wi-Fi_backend">https://wiki.archlinux.org/title/NetworkManager#Using_iwd_as_the_Wi-Fi_backend</a></p>
+<ol>
+<li>iwd mittels <code>pacman -S iwd</code> installieren</li>
+<li>Dem Networkmanager mitteilen, dass <code>iwd</code> als Backend verwendet werden soll. Dazu wird die Datei  <code>/etc/NetworkManager/conf.d/wifi_backend.conf</code> mit folgendem Inhalt angelegt:</li>
+</ol>
+<pre tabindex="0"><code>[device]
+wifi.backend=iwd
+</code></pre><ol start="3">
+<li><code>wpa_supplicant</code> am besten dann mit <code>sudo systemctl mask wpa_supplicant</code> maskieren. Das verhindert, dass irgendwie doch noch <code>wpa_supplicant</code> genutzt werden kann.</li>
+<li>Den Rechner einmal neustarten</li>
+<li>Die alte WIFI-Verbindung einmal löschen und neu verbinden.</li>
+</ol>
+<p>Seit ich diese Änderung auf meinem Thinkpad durchgeführt habe, läuft die WLAN-Verbindung stabil. Es gibt in KDE Plasma einen kleinen kosmetischen Bug. Beim Klicken auf das WLAN-Symbol wird in dem Widget nicht direkt der Status der WLAN-Verbindung angezeigt. In den Systemeinstellungen kann man aber die Verbindungsgeschwindigkeit sowie weitere Informationen einsehen. Im KDE-Forum habe ich bereits eine Diskussion mit diesem Problem gefunden. Für mich ist das nicht wichtig. Das Symbol selber signalisiert korrekt, ob ich mit dem WLAN verbunden bin. Das reicht für mich aus. Ich habe dafür aber auch Vorteile bemerkt. <code>iwd</code> baut die WIFI-Verbindung viel schneller auf. Insbesondere beim Aufwachen aus dem Standby muss ich nicht mehr lange warten. Für mich ist <code>iwd</code> eine Verbesserung und nicht nur, weil die Kernelpanics nicht mehr auftreten.</p>
+<p>Ja&hellip; manchmal muss man in Linux vielleicht auch bei einem Bug um die Ecke denken. Es gibt oft nicht nur ein Tool, welches Funktionen bereitstellt. Sondern zwei oder drei oder viele. Und manchmal hilft es dann einfach, das Tool zu wechseln. Ich bin aber zuversichtlich, dass auch <code>wpa_supplicant</code> irgendwann mit WIFI 7 umgehen kann.</p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
+			<h1><a href="https://jan-iversen.de/2026/03/22/arch.html">Arch</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/03/22/arch.html" class="u-url"><time class="dt-published" datetime="2026-03-22 20:02:49 &#43;0100">Mar 22, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Ich bin also wieder bei Arch gelandet. Eigentlich wollte ich ja openSUSE Tumbleweed nutzen. Aber zum einen hatte ich Probleme mit dem Repository für die Codecs. Und zum anderen gab es doch einige Programme, die nicht direkt als RPM im Repo vorhanden sind. Unter anderem sind für mich Element Desktop, Obsidian und Signal wichtig. Gerade bei Element und Obsidian habe ich den Eindruck, dass die Flatpaks nicht so gut funktionieren.</p>
+<p>Also habe ich gestern und heute sowohl mein Notebook Jupiter als auch meinen PC Mars auf Arch umgestellt. Und ja&hellip; Vanilla Arch. Kein EndeavourOS, kein CachyOS. Ich habe es auf beiden Systemen mittels archinstall und dem Wiki es sogar geschafft, dass ich automatische Snapshots während eines Updates habe. Es ist also wie openSUSE. Wenn ein Update schwere Fehler mitbringen sollte, kann ich auf einen älteren Snapshot wechseln und hoffentlich das Problem aussitzen.</p>
+<p>Mir gefällt Arch. Man merkt irgendwie, dass es eine reine Community-Distribution ist. Die Struktur ist klar, alles ist recht logisch aufgebaut. Und das Arch-Wiki ist wohl die beste Linux-Dokumentation, die man finden kann. Da können sich viele andere Distributionen eine große Scheibe von abschneiden. Ich weiß, so etwas ist nur durch viel Einsatzbereitschaft der Maintainer und Entwickler möglich. Und dafür möchte ich hier einfach Danke sagen.</p>
+<p>Ich bin gespannt, wie sich jetzt Arch die nächste Zeit schlägt. Auf meinem PC Mars hatte ich wirklich lange EndeavourOS im Einsatz. Meine Phase des extremen Distrohoppings fing eigentlich erst mit dem Thinkpad an, da ich hier auf die WLAN- und Stabilitätsprobleme gestoßen bin. Bisher&hellip; mit abgeschaltetem Wifi-7 läuft die Kiste aber richtig gut. Von daher hoffe ich, dass es jetzt so bleibt. Und dass ich mich auf eine ruhige Zeit mit Arch freuen kann.</p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 
 		<a href="https://jan-iversen.de/2026/03/22/nach-einigen-problemen-mit-codes.html" class="u-url"><time class="dt-published" datetime="2026-03-22 09:15:41 &#43;0100">Mar 22, 2026</time></a>
 
 		<div class="e-content">
-			 <p>Nach einigen Problemen mit Codes&hellip; ich bin dann doch wieder bei Arch. Inklusive Snapshots :-D
-<!-- raw HTML omitted --></p>
+			 <p>Nach einigen Problemen mit Codecs in Tumbleweed&hellip; ich bin dann doch wieder bei Arch. Inklusive Snapshots :-D</p>
+<!-- raw HTML omitted -->
 
 		</div>
 	  </div>
@@ -471,7 +518,7 @@ Jetzt ist Debian auf dem neuen Thinkpad soweit eingerichtet, dass ich das Gerät
 
 		<div class="e-content">
 			 <p>Gestern kam das neue Thinkpad an. Ein T15 Gen 5 mit AMD-CPU. Sehr schönes Gerät. Debian lässt sich leider nicht installieren. Während der Erkennung der Netzwerkkarten wird eine Kernel-Panik ausgelöst. Also wurde Arch installiert. Einige Kleinigkeiten müssen noch eingerichtet werden, aber das meiste ist fertig. Und das läuft erste Sahne.</p>
-<p><img src="https://eu.uploads.micro.blog/256866/2025/0a51fdcf0d.jpg" alt="Auto-generated description: Ein Laptop mit einem Neon-Stadtszene-Hintergrund zeigt ein Terminalfenster mit Systeminformationen."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/0a51fdcf0d.jpg" alt="Auto-generated description: Ein Laptop mit einem Neon-Stadtszene-Hintergrund zeigt ein Terminalfenster mit Systeminformationen."></p>
 
 		</div>
 	  </div>
@@ -560,7 +607,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 <p>Unter XFCE mit X11 habe ich all diese Probleme nicht. Vielleicht sind diese Kinderkrankheiten von Wayland dann behoben, wenn XFCE auch Wayland kann.</p>
 <h1 id="vielleicht-doch-mal-etwas-anderes-probieren">Vielleicht doch mal etwas anderes probieren?</h1>
 <p>Aktuell sehe ich keinen Grund, einen anderen Desktop zu installieren. XFCE ist einfach rock solid und für mich der stabile Fels in der hektischen Arch-Welt. Ich warte auf ein neues Thinkpad. Und ich bin ernsthaft am überlegen, ob ich nicht vielleicht Debian darauf installiere. Dann hätte ich wohl die langweiligste Linux-Distribution mit dem langweiligsten Desktop auf dem langweiligsten Notebook. Interessante Idee.</p>
-<p><img src="https://eu.uploads.micro.blog/256866/2025/bildschirmfoto-2025-10-29-19-40-59.png" alt="XFCE-Desktop. Hintergrundbild: Eine nächtliche Szene im Retrowave-Stil zeigt ein Paar, das sich vor einem futuristischen Auto unter einem leuchtenden Vollmond befindet, umgeben von Palmen und Neonlichtern."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/bildschirmfoto-2025-10-29-19-40-59.png" alt="XFCE-Desktop. Hintergrundbild: Eine nächtliche Szene im Retrowave-Stil zeigt ein Paar, das sich vor einem futuristischen Auto unter einem leuchtenden Vollmond befindet, umgeben von Palmen und Neonlichtern."></p>
 
 		</div>
 	  </div>
@@ -904,7 +951,7 @@ Du siehst, irgendwie mache ich in meiner Freizeit etwas sehr ähnliches wie im B
     (advice-add <span style="color:#e6db74">&#39;org-roam-ui-mode</span> <span style="color:#e6db74">:after</span> <span style="color:#e6db74">&#39;jan/org-roam-ui--save-dir</span>)
 </code></pre></div><h1 id="beispielvorschau-im-browser-spoiler">Beispielvorschau im Browser (Spoiler)</h1>
 <!-- raw HTML omitted -->
-<p><img src="https://eu.uploads.micro.blog/256866/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
 <!-- raw HTML omitted -->
 
 		</div>
@@ -968,7 +1015,7 @@ Also stell dir vielleicht diese beiden Fragen.</p>
 <li>Kannst und willst du dafür einiges an Zeit aufbringen?</li>
 </ol>
 <p>Wenn du beide Fragen mit Ja beantwortest… dann schau dir doch Emacs mal an. Prot hat einige gute Videos. Schau dir auch vielleicht ein Video zum Orgmode an. Und dann verspürst du auch den Drang ein Programm kennenzulernen, welches so anders ist.</p>
-<p><img src="https://eu.uploads.micro.blog/256866/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
+<p><img src="https://jan-iversen.de/uploads/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
 
 		</div>
 	  </div>
