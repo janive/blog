@@ -24,10 +24,41 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/03/29/opensuse-tumbleweed-challenge.html">openSUSE Tumbleweed Challenge</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/03/29/opensuse-tumbleweed-challenge.html" class="u-url"><time class="dt-published" datetime="2026-03-29 12:18:07 &#43;0200">Mar 29, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Ich hatte nach meinen Codec-Problemen mit Tumbleweed kurz Arch auf meinen Systemen. Jetzt bin ich aber wieder zurück zu Tumbleweed gewechselt. Ich hatte mich ein wenig mit den Codec-Problemen beschäftigt und verstehe nun, woher die Probleme gekommen sind.</p>
+<h1 id="codecs-in-opensuse-tumbleweed">Codecs in openSUSE Tumbleweed</h1>
+<p>openSUSE ist sehr strikt, wenn es um die Bereitstellung von Codecs geht. Das liegt, soweit ich es verstehe, an den Lizenzen. Fedora z. B. liefert ebenfalls keine unfreien Codecs aus. In beiden Distributionen gibt es jeweils ein separates Repository, welches unfreie Codecs bereitstellt. Bei openSUSE ist dies Packman (nicht mit pacman dem Arch-Paketmanager verwechseln). Es gibt das Tool opi, welches mittels <code>zypper in opi</code> installiert werden kann. Wenn man nun <code>opi codecs</code> aufruft, werden die Codecs aus dem Packman-Repository installiert. Dies führt zu einem Anbieterwechsel der entsprechenden Pakete.</p>
+<h2 id="was-sind-die-probleme-mit-packman">Was sind die Probleme mit Packman?</h2>
+<p>Packman hat zwei Probleme.</p>
+<ol>
+<li>Es ist kein offizielles Repository.
+Das Repository wird unabhängig vom openSUSE-Projekt verwaltet. Wie oben geschrieben&hellip; Lizenzprobleme. Das bedeutet, dass man sich ein Dritt-Repository in sein System einbindet. Die Pakete liegen außerhalb von openSUSE und können theoretisch kompromittiert sein. Jetzt muss man für sich selber entscheiden, wie weit man diesem Repository vertraut.</li>
+<li>Sync-Probleme
+Das war mein Problem. Es gab in Tumbleweed Updates für Pakete, die auch innerhalb von Packman liegen und durch die Codecs installiert waren (ich glaube ffmpeg war es). Das Packman-Repository benötigt etwas Zeit, um diese Änderungen bei sich bereitzustellen. In meinem Fall waren es mehrere Tage, sofern ich es auf Reddit verfolgen konnte. Zu dem Zeitpunkt hatte ich Arch installiert.</li>
+</ol>
+<h1 id="wieder-auf-tumbleweed">Wieder auf Tumbleweed</h1>
+<p>Ich habe mich trotz der Probleme dazu entschieden, doch wieder Tumbleweed zu installieren. Und auch das Problem mit Packman für mich zu lösen.
+Warum ich wieder bei Tumbleweed bin? Zum einen ist die Integration der automatischen Snapshots mittels Snapper perfekt gelöst. Zum anderen&hellip; die Community ist sehr unaufgeregt. Egal ob ich in das subreddit r/openSUSE oder in das Forum oder auf Matrix reinschaue, Diskussionen sind ruhig und sachlich. Ich habe den Eindruck, dass es einen recht festen und treuen Kern an openSUSE-Benutzern und Experten gibt. Außerdem werden geplante Änderungen ruhig besprochen und nicht übereilt durchgeführt.
+Und ich habe das Codec-Problem für mich vorerst gelöst. Ich verwende das Packman-Repository einfach nicht. Für Programme, die Codecs benötigen, bin ich auf die Flatpak-Variante umgestiegen. Das betrifft bei mir aktuell Firefox und VLC. Über Flatpak bringen beide Codecs mit. Und die Codecs bieten auch Hardwarebeschleunigung. Das löst dann das Auftreten von Sync-Problemen mit Packman und auch die Vertrauensfrage ist gelöst.</p>
+<blockquote>
+<p>Wichtige Anmerkung hier: Wenn man dann Firefox und VLC mittels zypper deinstalliert, sollte man die Pakete danach in zypper &ldquo;locken&rdquo;. Sonst könnten sie bei einem Update wieder installiert werden. Der Befehl dazu lautet <code>zypper al firefox</code> bzw. <code>zypper al vlc</code>. Mit <code>zypper locks</code> kann man sich alle gelockten Pakete ausgeben lassen.</p>
+</blockquote>
+<p>Jetzt nutze ich also openSUSE Tumbleweed. Und ich will das als Challenge angehen. Bis Ende April muss ich mindestens bei Tumbleweed bleiben. Also gut einen Monat. Ich bin gespannt, wie es läuft.</p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 			<h1><a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html">Thinkpad läuft jetzt stabil</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html" class="u-url"><time class="dt-published" datetime="2026-03-24 17:17:26 &#43;0100">Mar 24, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html" class="u-url"><time class="dt-published" datetime="2026-03-24 18:17:26 &#43;0200">Mar 24, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Ich hatte bereits von den Stabilitätsproblemen mit meinem Thinkpad und dem Linuxkernel 6.18 bzw. 6.19 in Verbindung mit der WCN785x-WIFI-Karte (Fastconnect 7800) und WIFI 7 berichtet <a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html">https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html</a>. Die Abschaltung von WIFI 7 in meinem Router hat die Probleme beseitigt. Darüber habe ich in meinem Blog hier geschrieben.</p>
@@ -58,7 +89,7 @@ wifi.backend=iwd
 			<h1><a href="https://jan-iversen.de/2026/03/22/arch.html">Arch</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2026/03/22/arch.html" class="u-url"><time class="dt-published" datetime="2026-03-22 20:02:49 &#43;0100">Mar 22, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/22/arch.html" class="u-url"><time class="dt-published" datetime="2026-03-22 21:02:49 &#43;0200">Mar 22, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Ich bin also wieder bei Arch gelandet. Eigentlich wollte ich ja openSUSE Tumbleweed nutzen. Aber zum einen hatte ich Probleme mit dem Repository für die Codecs. Und zum anderen gab es doch einige Programme, die nicht direkt als RPM im Repo vorhanden sind. Unter anderem sind für mich Element Desktop, Obsidian und Signal wichtig. Gerade bei Element und Obsidian habe ich den Eindruck, dass die Flatpaks nicht so gut funktionieren.</p>
@@ -72,7 +103,7 @@ wifi.backend=iwd
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/03/22/nach-einigen-problemen-mit-codes.html" class="u-url"><time class="dt-published" datetime="2026-03-22 09:15:41 &#43;0100">Mar 22, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/22/nach-einigen-problemen-mit-codes.html" class="u-url"><time class="dt-published" datetime="2026-03-22 10:15:41 &#43;0200">Mar 22, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Nach einigen Problemen mit Codecs in Tumbleweed&hellip; ich bin dann doch wieder bei Arch. Inklusive Snapshots :-D</p>
@@ -84,7 +115,7 @@ wifi.backend=iwd
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/03/17/nachdem-ich-endlich-die-stabilittsprobleme.html" class="u-url"><time class="dt-published" datetime="2026-03-17 06:46:18 &#43;0100">Mar 17, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/17/nachdem-ich-endlich-die-stabilittsprobleme.html" class="u-url"><time class="dt-published" datetime="2026-03-17 07:46:18 &#43;0200">Mar 17, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Nachdem ich endlich die <a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html">Stabilitätsprobleme</a> auf meinem Thinkpad in den Griff bekommen habe &hellip;.</p>
@@ -99,7 +130,7 @@ wifi.backend=iwd
 			<h1><a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html">Thinkpad und Kernelpanics... wenn es zu modern ist... knallt es eben.</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html" class="u-url"><time class="dt-published" datetime="2026-03-15 16:17:42 &#43;0100">Mar 15, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/15/thinkpad-und-kernelpanics-wenn-es.html" class="u-url"><time class="dt-published" datetime="2026-03-15 17:17:42 &#43;0200">Mar 15, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Seit Monaten suche ich ja schon eine Lösung für die Kernelpanics auf meinem Thinkpad. Heute hatte ich den Durchbruch.</p>
@@ -123,6 +154,9 @@ wifi.backend=iwd
 <p>Ich werde das Problem weiter beobachten. Vielleicht bringt der Kernel 7.0 dann die Verbesserungen und Fixes. Ich werde das Problem auf jeden Fall in den nächsten Tagen im CachyOS-Forum posten. Vielleicht hilft jemandem diese Erkenntnis oder jemand kann bei weiteren Analysen unterstützen.</p>
 <h1 id="update">Update</h1>
 <p>Ich habe den Bug mal im openSUSE-Projekt gemeldet: <a href="https://bugzilla.opensuse.org/show_bug.cgi?id=1259775">https://bugzilla.opensuse.org/show_bug.cgi?id=1259775</a></p>
+<h1 id="update-2">Update 2</h1>
+<p>Es gibt eine Lösung, um WIFI 7 nutzen zu können. Ich beschreibe das hier:
+<a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html">https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html</a></p>
 
 		</div>
 	  </div>
@@ -518,7 +552,7 @@ Jetzt ist Debian auf dem neuen Thinkpad soweit eingerichtet, dass ich das Gerät
 
 		<div class="e-content">
 			 <p>Gestern kam das neue Thinkpad an. Ein T15 Gen 5 mit AMD-CPU. Sehr schönes Gerät. Debian lässt sich leider nicht installieren. Während der Erkennung der Netzwerkkarten wird eine Kernel-Panik ausgelöst. Also wurde Arch installiert. Einige Kleinigkeiten müssen noch eingerichtet werden, aber das meiste ist fertig. Und das läuft erste Sahne.</p>
-<p><img src="https://jan-iversen.de/uploads/2025/0a51fdcf0d.jpg" alt="Auto-generated description: Ein Laptop mit einem Neon-Stadtszene-Hintergrund zeigt ein Terminalfenster mit Systeminformationen."></p>
+<p><img src="https://eu.uploads.micro.blog/256866/2025/0a51fdcf0d.jpg" alt="Auto-generated description: Ein Laptop mit einem Neon-Stadtszene-Hintergrund zeigt ein Terminalfenster mit Systeminformationen."></p>
 
 		</div>
 	  </div>
@@ -607,7 +641,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 <p>Unter XFCE mit X11 habe ich all diese Probleme nicht. Vielleicht sind diese Kinderkrankheiten von Wayland dann behoben, wenn XFCE auch Wayland kann.</p>
 <h1 id="vielleicht-doch-mal-etwas-anderes-probieren">Vielleicht doch mal etwas anderes probieren?</h1>
 <p>Aktuell sehe ich keinen Grund, einen anderen Desktop zu installieren. XFCE ist einfach rock solid und für mich der stabile Fels in der hektischen Arch-Welt. Ich warte auf ein neues Thinkpad. Und ich bin ernsthaft am überlegen, ob ich nicht vielleicht Debian darauf installiere. Dann hätte ich wohl die langweiligste Linux-Distribution mit dem langweiligsten Desktop auf dem langweiligsten Notebook. Interessante Idee.</p>
-<p><img src="https://jan-iversen.de/uploads/2025/bildschirmfoto-2025-10-29-19-40-59.png" alt="XFCE-Desktop. Hintergrundbild: Eine nächtliche Szene im Retrowave-Stil zeigt ein Paar, das sich vor einem futuristischen Auto unter einem leuchtenden Vollmond befindet, umgeben von Palmen und Neonlichtern."></p>
+<p><img src="https://eu.uploads.micro.blog/256866/2025/bildschirmfoto-2025-10-29-19-40-59.png" alt="XFCE-Desktop. Hintergrundbild: Eine nächtliche Szene im Retrowave-Stil zeigt ein Paar, das sich vor einem futuristischen Auto unter einem leuchtenden Vollmond befindet, umgeben von Palmen und Neonlichtern."></p>
 
 		</div>
 	  </div>
@@ -951,7 +985,7 @@ Du siehst, irgendwie mache ich in meiner Freizeit etwas sehr ähnliches wie im B
     (advice-add <span style="color:#e6db74">&#39;org-roam-ui-mode</span> <span style="color:#e6db74">:after</span> <span style="color:#e6db74">&#39;jan/org-roam-ui--save-dir</span>)
 </code></pre></div><h1 id="beispielvorschau-im-browser-spoiler">Beispielvorschau im Browser (Spoiler)</h1>
 <!-- raw HTML omitted -->
-<p><img src="https://jan-iversen.de/uploads/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
+<p><img src="https://eu.uploads.micro.blog/256866/2025/orgroamui.png" alt="Auto-generated description: Ein Netzwerkdiagramm zeigt verschiedene miteinander verbundene Knoten in verschiedenen Farben, wobei rechts detaillierte Informationen zu Gunther Arasek aufgeführt sind."></p>
 <!-- raw HTML omitted -->
 
 		</div>
@@ -1015,7 +1049,7 @@ Also stell dir vielleicht diese beiden Fragen.</p>
 <li>Kannst und willst du dafür einiges an Zeit aufbringen?</li>
 </ol>
 <p>Wenn du beide Fragen mit Ja beantwortest… dann schau dir doch Emacs mal an. Prot hat einige gute Videos. Schau dir auch vielleicht ein Video zum Orgmode an. Und dann verspürst du auch den Drang ein Programm kennenzulernen, welches so anders ist.</p>
-<p><img src="https://jan-iversen.de/uploads/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
+<p><img src="https://eu.uploads.micro.blog/256866/2025/emas-blogeintrag.png" alt="Auto-generated description: Ein Texteditor mit einem Artikel über die Verwendung von Emacs wird auf einem Bildschirm angezeigt."></p>
 
 		</div>
 	  </div>
