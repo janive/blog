@@ -24,6 +24,52 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/04/04/die-ersten-eindrcke-mit-einem.html">Die ersten Eindrücke mit einem eigenen Matrix-Server</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/04/04/die-ersten-eindrcke-mit-einem.html" class="u-url"><time class="dt-published" datetime="2026-04-04 09:37:23 &#43;0200">Apr 4, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Ich hatte hier bereits geschrieben, dass ich einen eigenen Matrix-Server eingerichtet habe. Nach etwa vier Wochen kann ich von meinen ersten Erfahrungen und Eindrücken berichten. Vorab: Es gibt gute Dinge und es gibt schlechte Dinge zu berichten.</p>
+<h1 id="betrieb-des-servers">Betrieb des Servers</h1>
+<p>Der Betrieb des Servers selbst ist bisher sehr einfach. Als Basis wird ein V-Server von Netcup eingerichtet. Der Server hat vier Kerne, 8 GByte RAM und 250 GByte SSD-Speicher. Angebunden ist er im Netcup-Rechenzentrum mit 2,5 GBit. Auf dem Server habe ich Element-Web, Synapse, Livekit und einige weitere Hilfsdienste für den Betrieb des Matrix-Servers installiert.
+Meine Anforderungen sind recht gering. Ein paar Freunde und ich sind auf dem Server und nutzen ihn zum Chatten, Austausch von Notizen für das Rollenspiel und Videocalls.
+In den vier Wochen gab es einige Updates, die dank der Docker-Compose-Datei innerhalb von Sekunden eingespielt werden konnten. Ich hatte bisher bei keinem Update ein Problem.
+Im Betrieb werden knapp 1,8 GByte RAM benötigt. Ein Großteil davon verbraucht Synapse. Der Server kann ohne Probleme Videocalls verkraften. Die CPU langweilt sich, wenn sechs Personen in einem Call sind. Ich schätze, dass locker 30-50 Personen gleichzeitig Videocalls in Gruppen durchführen könnten.
+Abgesehen von der eher gruseligen Einrichtung läuft alles.</p>
+<h1 id="element-fluffychat-cinny-neochat-clients-soweit-das-auge-reicht">Element, Fluffychat, Cinny, Neochat&hellip; Clients soweit das Auge reicht</h1>
+<p>Ich habe einige Clients ausprobiert. Im Gegensatz zu Discord hat man hier eine recht große Auswahl. Auf dem Server selber ist Element-Web installiert. Aber der wird wohl nur von einigen Nutzern sporadisch verwendet. Soweit ich es mitbekommen habe, hat jeder sich einen Desktop-Client installiert.</p>
+<h2 id="element">Element</h2>
+<p>Element ist wohl der Platzhirsch. Der Client funktioniert auf dem Desktop gut. Es ist eine Electron-Anwendung, wenn ich es richtig weiß. Im Prinzip wird also nur ein Browser gestartet und darin läuft dann der Web-Client lokal auf dem PC. Die Bedienung ist gut. Manchmal könnte der Client gerne ein wenig zügiger reagieren. Man muss sich an der ein- oder anderen Stelle etwas umgewöhnen. Element wirkt generell sehr business- oder behördenorientiert. Es gibt so gut wie keine Features, die man eher in einem privat- oder gamingfokussierten Messenger erwartet. Keine Gifs, keine eigenen Emojis, kein Schnickschnack.
+Ich habe in Element einen Bug entdeckt. Wenn mein Theme in Plasma sich von hell auf dunkel ändert, dann ist die Oberfläche in Element kaputt. Es sieht dann so aus, wie eine Webseite ohne CSS. Ein Neustart von Element behebt das Problem dann. Aktuell nutze ich Element nur, wenn ich Videocalls nutzen möchte.</p>
+<h2 id="fluffychat">Fluffychat</h2>
+<p>Fluffychat nutze ich auf dem Smartphone. Der Messenger ist richtig gut. Er ist schnell, die Bedienung ist super und er macht überhaupt keine Probleme. Er sieht auch noch gut aus. Aber&hellip; er kann keinen Videocall (zumindest nicht die neue Gruppen-Callfunktion). Auf dem Smartphone benötige ich das nicht. Daher ist es dort mein Go-to-Messenger geworden.</p>
+<h2 id="cinny">Cinny</h2>
+<p>Ein Kumpel hat bei sich Cinny gehostet. Cinny versucht scheinbar die Oberfläche von Discord nachzubauen. Insbesondere verschachtelte Matrix-Spaces werden hier am besten dargestellt. Für Umsteiger ist Cinny eine Überlegung wert. Cinny kann wie Element mittlerweile die neue Video-Call-Funktion.</p>
+<h2 id="neochat">Neochat</h2>
+<p>Das ist aktuell mein Matrix-Client, den ich auf dem PC nutze. Er nutzt qt als Framework und passt damit natürlich sehr gut in die Welt von KDE Plasma. Neochat ist bei der Bedienung ok. Verschachtelte Spaces sind bisher schlecht umgesetzt. Und es gibt nicht die neue Call-Funktion. Außerdem zeigt Neochat manchmal Benachrichtigungen an, die schon lange erledigt sind. Mein größtes Problem bei der Einrichtung war die Entschlüsselung der alten Chats. Neochat kann nicht die Verifikation mittels eines anderen Clients korrekt durchführen (der Abgleich der lustigen Emojis). Ebenso kann man nicht den Wiederherstellungsschlüssel verwenden. Neochat hat diese Funktion einfach nicht. Ich musste aus Element einen separaten Entschlüsselungskey mit Passwort erzeugen und konnte diesen Key dann in Neochat importieren. Das versteht ein technisch unbedarfter Anwender mit Sicherheit nicht. Hier sollte dringend nachgebessert werden.
+Da der Client aber gut in Plasma passt, nutze ich ihn. Er ist stabil und schnell. Ich würde Neochat aber nur bedingt weiterempfehlen.</p>
+<h1 id="die-guten-seiten">Die guten Seiten</h1>
+<p>Der Server läuft. Ich habe auch bisher keine Probleme gemeldet bekommen. Nachrichten werden sehr schnell zugestellt. Die Videocalls funktionieren ausgezeichnet. Die Auswahl an Clients ist gut und die meisten funktionieren auch gut.</p>
+<h1 id="die-schlechten-seiten">Die schlechten Seiten</h1>
+<p>Es gibt auch einige echt blöde Dinge&hellip;</p>
+<h2 id="verschlüsselte-nachrichten">Verschlüsselte Nachrichten</h2>
+<p>Ein Benutzer auf meinem Server kann alte Nachrichten in einem Chat nicht einsehen. Er ist Mitglied in dem Chat. Das kann man im Raum sehen. Ich habe zwei Tage später dort Nachrichten gepostet. Sein Client entschlüsselt die Nachrichten aber nicht. Ich habe die Vermutung, dass er per Webclient dem Chat beigetreten ist. Und dass dann irgendetwas im Client schief gelaufen ist. Ich habe es auf jeden Fall nicht verstanden, warum das Problem bei ihm aufgetreten ist. Das war für ihn ein frustrierendes Erlebnis. Hier muss Matrix nachbessern und klarer mitteilen, warum etwas nicht gelesen werden kann. Soweit ich weiß, sollten die Entschlüsselungskeys zwischen den Clients ausgetauscht werden. Aber vielleicht habe ich da auch Matrix komplett falsch verstanden.</p>
+<h2 id="föderation-und-große-räume">Föderation und große Räume</h2>
+<p>Mein Server darf föderieren. Mit anderen Worten: ich kann mit meinem Account auf meinem Server auch fremde Server kontaktieren und dort chatten. Ich habe das mit dem Matrix-Server von openSUSE getan. Es ist teilweise unfassbar langsam. Ob ich mir die Liste der Räume anzeigen lassen möchte oder große Räume mit mehreren tausend Mitgliedern beitreten möchte, mein Server stirbt dann fast. Und ich weiß nicht, warum. Was kann so schwer sein, einem Raum beizutreten? Was muss dabei geschehen? Es reicht doch, wenn der Chat der letzten Tage geladen wird. Wenn ich dann zurück scrolle, können die älteren Nachrichten geladen werden. Es gibt sogar einen Raum, dem kann ich nicht beitreten. Wenn ich es versuche, hängt mein Server bei 100% CPU-Last und der RAM-Bedarf explodiert&hellip; warum??? Keine Ahnung&hellip;</p>
+<h2 id="und-jetzt-kommt-die-richtig-üble-sache">Und jetzt kommt die richtig üble Sache.</h2>
+<p>Wir wollten eigentlich Discord den Rücken kehren. Primär ist die Videocall-Funktion für uns interessant. So spielen wir Dungeons and Dragons. Technisch funktioniert das auch richtig gut. Aber nur technisch.
+Kein Client, wirklich keiner&hellip; absolut keiner.. ist in der Lage Hintergrundgeräusche in irgendeiner Art und Weise herauszufiltern. Tastaturgeräusche, Einfüllen von Wasser, das Rascheln der Chipstüte, alles wird in einer fantastischen Lautstärke präsentiert. Element selbst hat als einziger Client eine Option für die Filterung von Geräuschen. Aber ich habe den Eindruck, dass die Option Placebo ist. Vielleicht wird da maximal das Rauschen von Lüftern herausgefiltert.
+Ich weiß&hellip; Discord ist da richtig gut. Das ist kein Verdienst von Discord. Sie haben lediglich eine externe Methode für Geräuschunterdrückung lizenziert (Krisp). Ich verstehe auch, dass kein Matrix-Client eine kostenpflichtige Option integrieren kann. Aber es gibt auch kostenlose, sogar freie Lösungen. Hier wünsche ich mir, dass die Entwickler der Clients sich dem Thema annehmen und etwas integrieren. Eine Option für ein Noisegate wäre übrigens auch hilfreich. Dann könnte das Mikrofonsignal erst ab einer bestimmten Lautstärke übertragen werden. Das sollte zumindest ein wenig Abhilfe schaffen.</p>
+<h1 id="aktuelles-fazit">Aktuelles Fazit</h1>
+<p>Matrix ist grundsätzlich toll. Es hat zwar Ecken und Kanten. Aber es funktioniert im Grundsatz. Wie so oft&hellip; fehlen aber einige Funktionen, die echt wichtig wären. Ich habe bisher aber den Eindruck, wenn ich mir die Tickets und Blog-Einträge anschaue, dass niemand ernsthaft versucht Discord anzugreifen und notwendige Features wie Geräuschunterdrückung oder bessere Nutzererfahrung in Bezug auf die Verschlüsselung anzugehen. Es freut mich, wenn Belgien Matrix als Messenger für Behörden einführt. Wirklich&hellip; ich finde das toll. Aber bitte lieber Entwickler&hellip; holt die privaten Communities mit guten Funktionen ab.
+Ich werde den Server weiter betreiben (ich nutze ihn wirklich viel). Ich habe auch eine kleine, regelmäßige Spende an die Matrix-Foundation eingerichtet. Denn ich hoffe und glaube, dass Matrix wirklich gut werden kann und wir damit etwas souveräner werden.</p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 			<h1><a href="https://jan-iversen.de/2026/03/29/opensuse-tumbleweed-challenge.html">openSUSE Tumbleweed Challenge</a></h1>
 		
 
@@ -39,7 +85,7 @@
 <li>Es ist kein offizielles Repository.
 Das Repository wird unabhängig vom openSUSE-Projekt verwaltet. Wie oben geschrieben&hellip; Lizenzprobleme. Das bedeutet, dass man sich ein Dritt-Repository in sein System einbindet. Die Pakete liegen außerhalb von openSUSE und können theoretisch kompromittiert sein. Jetzt muss man für sich selber entscheiden, wie weit man diesem Repository vertraut.</li>
 <li>Sync-Probleme
-Das war mein Problem. Es gab in Tumbleweed Updates für Pakete, die auch innerhalb von Packman liegen und durch die Codecs installiert waren (ich glaube ffmpeg war es). Das Packman-Repository benötigt etwas Zeit, um diese Änderungen bei sich bereitzustellen. In meinem Fall waren es mehrere Tage, sofern ich es auf Reddit verfolgen konnte. Zu dem Zeitpunkt hatte ich Arch installiert.</li>
+Das war mein Problem. Es gab in Tumbleweed Updates für Pakete, die auch innerhalb von Packman liegen und durch die Codecs installiert waren (ich glaube ffmpeg war es). Das Packman-Repository benötigt etwas Zeit, um diese Änderungen bei sich bereitzustellen. Wenn man dann ein Update durchführt, möchte zypper die Pakete von openSUSE installieren (vendorchange). In meinem Fall waren es mehrere Tage, sofern ich es auf Reddit verfolgen konnte. Zu dem Zeitpunkt hatte ich Arch installiert.</li>
 </ol>
 <h1 id="wieder-auf-tumbleweed">Wieder auf Tumbleweed</h1>
 <p>Ich habe mich trotz der Probleme dazu entschieden, doch wieder Tumbleweed zu installieren. Und auch das Problem mit Packman für mich zu lösen.
@@ -49,6 +95,7 @@ Und ich habe das Codec-Problem für mich vorerst gelöst. Ich verwende das Packm
 <p>Wichtige Anmerkung hier: Wenn man dann Firefox und VLC mittels zypper deinstalliert, sollte man die Pakete danach in zypper &ldquo;locken&rdquo;. Sonst könnten sie bei einem Update wieder installiert werden. Der Befehl dazu lautet <code>zypper al firefox</code> bzw. <code>zypper al vlc</code>. Mit <code>zypper locks</code> kann man sich alle gelockten Pakete ausgeben lassen.</p>
 </blockquote>
 <p>Jetzt nutze ich also openSUSE Tumbleweed. Und ich will das als Challenge angehen. Bis Ende April muss ich mindestens bei Tumbleweed bleiben. Also gut einen Monat. Ich bin gespannt, wie es läuft.</p>
+<!-- raw HTML omitted -->
 
 		</div>
 	  </div>
