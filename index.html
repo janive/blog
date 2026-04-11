@@ -24,6 +24,129 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/04/11/orgagenda-als-icsdatei.html">Org-Agenda als ICS-Datei</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/04/11/orgagenda-als-icsdatei.html" class="u-url"><time class="dt-published" datetime="2026-04-11 16:35:56 &#43;0200">Apr 11, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Heute habe ich zusammen mit einer KI ein wenig gebastelt. Ich habe begonnen, meine Termine und Todos in einer Agenda-Datei in Emacs zu verwalten. Der berühmte Org-Mode wird jetzt genutzt. Mein Problem ist, dass es unterwegs auf dem Handy eher mühsam ist, eine org-Datei zu öffnen und zu lesen. Es gibt zwar das Programm orgzly-revived, welches org-Dateien einlesen und darstellen kann, aber ich werde mit dem Programm nicht so ganz warm.
+Meine Idee: Ich möchte einfach aus der org-Agenda für die nächsten 360 Tage eine ics-Datei exportieren lassen. Diese Datei soll auf einen meiner V-Server hochgeladen werden. Auf dem Smartphone soll dann ein Programm regelmäßig die Datei abrufen und in der Kalender-App zur Verfügung stellen.
+Dank KI war eine Funktion in Lisp recht zügig erstellt. Ich hatte noch mit einem HTML-Export experimentiert. Daher sind wohl einige Lisp-Funktionen unnötig. Aber vielleicht ist es für den ein oder anderen interessant.</p>
+<h2 id="schritt-1---erstelle-eine-ics-datei">Schritt 1 - Erstelle eine ICS-Datei</h2>
+<p>Das ist die Methode, die jetzt in meiner Emacs-Konfiguration vorhanden ist. Das Umkopieren der Dateien in meinen org-Ordner habe ich auskommentiert. Scheinbar kommt mein Sync-Client für meine NAS damit nicht klar und landet in einem endlosen Sync-Prozess. Einiges an Code ist also überflüssig. Gemini hat den soweit generiert und er funktioniert.
+Es werden in /tmp Dateien mit der exportieren HTML- und ICS-Agenda angelegt. Wie gesagt, die HTML-Agenda ist für mich jetzt überflüssig.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-lisp" data-lang="lisp">    (defvar my/agenda-export-running <span style="color:#66d9ef">nil</span>
+      <span style="color:#e6db74">&#34;Verhindert, dass der Export mehrfach gleichzeitig startet.&#34;</span>)
+    
+    (with-eval-after-load <span style="color:#e6db74">&#39;org-agenda</span>
+      <span style="color:#75715e">;; subr-x stellt den &#39;dlet&#39; Befehl bereit</span>
+      (<span style="color:#a6e22e">require</span> <span style="color:#e6db74">&#39;subr-x</span>)
+    
+      (defun my/export-and-push-agenda ()
+        <span style="color:#e6db74">&#34;Exportiert die Agenda NAS-schonend und lädt sie auf den v-Server hoch.&#34;</span>
+        (interactive)
+        (unless my/agenda-export-running
+          (<span style="color:#66d9ef">setq</span> my/agenda-export-running <span style="color:#66d9ef">t</span>)
+          (<span style="color:#66d9ef">unwind-protect</span>
+              (dlet ((org-agenda-span <span style="color:#ae81ff">365</span>)
+                     (org-agenda-sticky <span style="color:#66d9ef">nil</span>)
+                     (org-agenda-tags-column <span style="color:#ae81ff">-1</span>)
+                     (org-agenda-prefix-format <span style="color:#f92672">&#39;</span>((agenda <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34; %-10:c &#34;</span>)))
+                     (org-icalendar-include-todo <span style="color:#e6db74">&#39;all</span>))
+    
+                (<span style="color:#66d9ef">let</span> ((tmp-html <span style="color:#e6db74">&#34;/tmp/agenda.html&#34;</span>)
+                      (tmp-ics <span style="color:#e6db74">&#34;/tmp/agenda.ics&#34;</span>)
+                      (final-html (expand-file-name <span style="color:#e6db74">&#34;~/org/agenda.html&#34;</span>))
+                      (final-ics (expand-file-name <span style="color:#e6db74">&#34;~/org/agenda.ics&#34;</span>)))
+    
+                  <span style="color:#75715e">;; 1. Export in den Temp-Ordner (unsichtbar für das NAS)</span>
+                  (save-window-excursion
+                    (org-agenda-list)
+                    (with-current-buffer <span style="color:#e6db74">&#34;*Org Agenda*&#34;</span>
+                      (<span style="color:#66d9ef">let</span> ((inhibit-read-only <span style="color:#66d9ef">t</span>))
+                        (delete-trailing-whitespace))
+                      (org-agenda-write tmp-html)
+                      (org-agenda-write tmp-ics)
+                      (kill-buffer <span style="color:#e6db74">&#34;*Org Agenda*&#34;</span>)))
+    
+                  <span style="color:#75715e">;; 2. HTML-Design anpassen (Schriftgröße &amp; Umbruch)</span>
+                  (with-current-buffer (find-file-noselect tmp-html)
+                    (goto-char (point-min))
+                    (when (search-forward <span style="color:#e6db74">&#34;&lt;/style&gt;&#34;</span> <span style="color:#66d9ef">nil</span> <span style="color:#66d9ef">t</span>)
+                      (goto-char (match-beginning <span style="color:#ae81ff">0</span>))
+                      (insert <span style="color:#e6db74">&#34;      body { font-size: 20pt; font-family: sans-serif; line-height: 1.4; padding: 20px; }\n&#34;</span>)
+                      (insert <span style="color:#e6db74">&#34;      pre { white-space: pre-wrap; }\n&#34;</span>))
+                    (basic-save-buffer)
+                    (kill-buffer))
+    
+                  <span style="color:#75715e">;; 3. Dateien atomar an das NAS übergeben</span>
+                  <span style="color:#75715e">;;(rename-file tmp-html final-html t)</span>
+                  <span style="color:#75715e">;;(rename-file tmp-ics final-ics t)</span>
+    
+                  <span style="color:#75715e">;; 4. Geräuschloser Upload zum v-Server (jan-iversen.de)</span>
+                  (<span style="color:#66d9ef">let</span> ((default-directory <span style="color:#e6db74">&#34;~/&#34;</span>))
+                    (start-process <span style="color:#e6db74">&#34;agenda-upload&#34;</span> <span style="color:#66d9ef">nil</span>
+                                   <span style="color:#e6db74">&#34;scp&#34;</span> tmp-ics <span style="color:#e6db74">&#34;xxx@yyy:/var/www/ics/agenda.ics&#34;</span>))
+    
+                  (message <span style="color:#e6db74">&#34;Agenda-Export erfolgreich abgeschlossen.&#34;</span>)))
+    
+            <span style="color:#75715e">;; Diese Zeile MUSS innerhalb der unwind-protect Klammern stehen</span>
+            (<span style="color:#66d9ef">setq</span> my/agenda-export-running <span style="color:#66d9ef">nil</span>)))))
+
+<span style="color:#f92672">```</span>
+
+<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">2</span> <span style="color:#a6e22e">-</span> Vorbereiten des Servers
+
+Ich habe auf meinen virtuellen Server bereits NGINX im Einsatz. Ich habe mir dort lediglich unter <span style="color:#f92672">`</span>/var/www<span style="color:#f92672">`</span> den Ordner ics angelegt. Danach habe ich die Rechte an dem Ordner auf meinen Benutzer geändert. So kann ich einfach per scp eine Datei auf den Server kopieren.
+Eine neue Konfiguration für die Seite wurde angelegt. Und ich habe die Seite per htpasswd abgesichert. So kann niemand die Datei einfach herunterladen.
+
+
+<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">3</span> <span style="color:#a6e22e">-</span> DNS-Eintrag
+
+Bei Netcup habe ich einen neuen DNS-Eintrag gesetzt. Diesmal hat es nur wenige Minuten gedauert, bis der DNS-Eintrag auch überall bekannt war. Ich konnte also zügig weitermachen.
+
+
+<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">4</span> <span style="color:#a6e22e">-</span> Erster Test
+
+In Emacs habe ich die neue Methode das erste Mal gestartet. Die ICS-Datei wurde korrekt auf den Server kopiert. Über die URL konnte ich im Browser die Passwortabfrage testen und danach die Datei erfolgreich herunterladen. Hat also wunderbar geklappt.
+
+
+<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">5</span> <span style="color:#a6e22e">-</span> Einrichtung auf dem Handy
+
+Für Android gibt es das Programm ICSx<span style="color:#960050;background-color:#1e0010">⁵</span><span style="color:#f92672">.</span> Dieses Programm macht genau das, was ich wollte. Es lädt regelmäßig eine ICS-Datei herunter. In der Kalenderapp wird dann ein neuer Kalender angezeigt. Man kann noch Optionen wie Erinnerungszeiten setzen. Für mich reicht es aber, wenn ich die Einträge erst einmal im Kalender sehen kann.
+
+
+<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">6</span> <span style="color:#a6e22e">-</span> Automatischer Hook in Emacs
+
+Wenn ich etwas in Emacs an meiner Agenda ändere und speichere, soll ein Hook automatisch ausgeführt werden. Dieser Hook soll dann die Methode von oben aufrufen. Der ganze Vorgang geht erstaunlich schnell. Vielleicht liegt es daran, dass ich noch eine überschaubare Agenda habe.
+
+<span style="color:#f92672">```</span>lisp 
+    (defun my/org-agenda-maybe-push ()
+      <span style="color:#e6db74">&#34;Prüft beim Speichern, ob es die Agenda-Datei ist und startet dann den Export.&#34;</span>
+      (when (and (buffer-file-name)
+                 (<span style="color:#a6e22e">string=</span> (file-truename (buffer-file-name))
+                          (file-truename (expand-file-name <span style="color:#e6db74">&#34;~/org/Agenda.org&#34;</span>))))
+        <span style="color:#75715e">;; Wir stellen sicher, dass die Export-Funktion geladen ist</span>
+        (unless (<span style="color:#a6e22e">fboundp</span> <span style="color:#e6db74">&#39;my/export-and-push-agenda</span>)
+          (<span style="color:#a6e22e">require</span> <span style="color:#e6db74">&#39;org-agenda</span>))
+        (my/export-and-push-agenda)))
+    
+    <span style="color:#75715e">;; Den Hook global registrieren</span>
+    (add-hook <span style="color:#e6db74">&#39;after-save-hook</span> <span style="color:#a6e22e">#&#39;</span>my/org-agenda-maybe-push)
+
+<span style="color:#f92672">```</span>
+
+<span style="color:#960050;background-color:#1e0010">#</span> Fazit
+
+Um meine Termine unterwegs schnell einsehen zu können, reicht dieser Ansatz bisher. Es ist genügend automatisiert, damit ich mich auf den Prozess soweit verlassen kann. In meinem Backlog liegt aber als Todo bereits die Idee, eine richtige Caldav-Synchronisation mit Emacs gegen einen Caldav-Server einzurichten. Aber das ist noch Zukunftsmusik.
+
+</code></pre></div>
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 
 		<a href="https://jan-iversen.de/2026/04/06/ich-kommentiere-das-nicht-weiter.html" class="u-url"><time class="dt-published" datetime="2026-04-06 17:40:53 &#43;0200">Apr 6, 2026</time></a>
 
