@@ -94,35 +94,18 @@ Es werden in /tmp Dateien mit der exportieren HTML- und ICS-Agenda angelegt. Wie
             <span style="color:#75715e">;; Diese Zeile MUSS innerhalb der unwind-protect Klammern stehen</span>
             (<span style="color:#66d9ef">setq</span> my/agenda-export-running <span style="color:#66d9ef">nil</span>)))))
 
-<span style="color:#f92672">```</span>
-
-<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">2</span> <span style="color:#a6e22e">-</span> Vorbereiten des Servers
-
-Ich habe auf meinen virtuellen Server bereits NGINX im Einsatz. Ich habe mir dort lediglich unter <span style="color:#f92672">`</span>/var/www<span style="color:#f92672">`</span> den Ordner ics angelegt. Danach habe ich die Rechte an dem Ordner auf meinen Benutzer geändert. So kann ich einfach per scp eine Datei auf den Server kopieren.
-Eine neue Konfiguration für die Seite wurde angelegt. Und ich habe die Seite per htpasswd abgesichert. So kann niemand die Datei einfach herunterladen.
-
-
-<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">3</span> <span style="color:#a6e22e">-</span> DNS-Eintrag
-
-Bei Netcup habe ich einen neuen DNS-Eintrag gesetzt. Diesmal hat es nur wenige Minuten gedauert, bis der DNS-Eintrag auch überall bekannt war. Ich konnte also zügig weitermachen.
-
-
-<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">4</span> <span style="color:#a6e22e">-</span> Erster Test
-
-In Emacs habe ich die neue Methode das erste Mal gestartet. Die ICS-Datei wurde korrekt auf den Server kopiert. Über die URL konnte ich im Browser die Passwortabfrage testen und danach die Datei erfolgreich herunterladen. Hat also wunderbar geklappt.
-
-
-<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">5</span> <span style="color:#a6e22e">-</span> Einrichtung auf dem Handy
-
-Für Android gibt es das Programm ICSx<span style="color:#960050;background-color:#1e0010">⁵</span><span style="color:#f92672">.</span> Dieses Programm macht genau das, was ich wollte. Es lädt regelmäßig eine ICS-Datei herunter. In der Kalenderapp wird dann ein neuer Kalender angezeigt. Man kann noch Optionen wie Erinnerungszeiten setzen. Für mich reicht es aber, wenn ich die Einträge erst einmal im Kalender sehen kann.
-
-
-<span style="color:#960050;background-color:#1e0010">##</span> Schritt <span style="color:#ae81ff">6</span> <span style="color:#a6e22e">-</span> Automatischer Hook in Emacs
-
-Wenn ich etwas in Emacs an meiner Agenda ändere und speichere, soll ein Hook automatisch ausgeführt werden. Dieser Hook soll dann die Methode von oben aufrufen. Der ganze Vorgang geht erstaunlich schnell. Vielleicht liegt es daran, dass ich noch eine überschaubare Agenda habe.
-
-<span style="color:#f92672">```</span>lisp 
-    (defun my/org-agenda-maybe-push ()
+</code></pre></div><h2 id="schritt-2---vorbereiten-des-servers">Schritt 2 - Vorbereiten des Servers</h2>
+<p>Ich habe auf meinen virtuellen Server bereits NGINX im Einsatz. Ich habe mir dort lediglich unter <code>/var/www</code> den Ordner ics angelegt. Danach habe ich die Rechte an dem Ordner auf meinen Benutzer geändert. So kann ich einfach per scp eine Datei auf den Server kopieren.
+Eine neue Konfiguration für die Seite wurde angelegt. Und ich habe die Seite per htpasswd abgesichert. So kann niemand die Datei einfach herunterladen.</p>
+<h2 id="schritt-3---dns-eintrag">Schritt 3 - DNS-Eintrag</h2>
+<p>Bei Netcup habe ich einen neuen DNS-Eintrag gesetzt. Diesmal hat es nur wenige Minuten gedauert, bis der DNS-Eintrag auch überall bekannt war. Ich konnte also zügig weitermachen.</p>
+<h2 id="schritt-4---erster-test">Schritt 4 - Erster Test</h2>
+<p>In Emacs habe ich die neue Methode das erste Mal gestartet. Die ICS-Datei wurde korrekt auf den Server kopiert. Über die URL konnte ich im Browser die Passwortabfrage testen und danach die Datei erfolgreich herunterladen. Hat also wunderbar geklappt.</p>
+<h2 id="schritt-5---einrichtung-auf-dem-handy">Schritt 5 - Einrichtung auf dem Handy</h2>
+<p>Für Android gibt es das Programm ICSx⁵. Dieses Programm macht genau das, was ich wollte. Es lädt regelmäßig eine ICS-Datei herunter. In der Kalenderapp wird dann ein neuer Kalender angezeigt. Man kann noch Optionen wie Erinnerungszeiten setzen. Für mich reicht es aber, wenn ich die Einträge erst einmal im Kalender sehen kann.</p>
+<h2 id="schritt-6---automatischer-hook-in-emacs">Schritt 6 - Automatischer Hook in Emacs</h2>
+<p>Wenn ich etwas in Emacs an meiner Agenda ändere und speichere, soll ein Hook automatisch ausgeführt werden. Dieser Hook soll dann die Methode von oben aufrufen. Der ganze Vorgang geht erstaunlich schnell. Vielleicht liegt es daran, dass ich noch eine überschaubare Agenda habe.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-lisp" data-lang="lisp">    (defun my/org-agenda-maybe-push ()
       <span style="color:#e6db74">&#34;Prüft beim Speichern, ob es die Agenda-Datei ist und startet dann den Export.&#34;</span>
       (when (and (buffer-file-name)
                  (<span style="color:#a6e22e">string=</span> (file-truename (buffer-file-name))
@@ -135,13 +118,9 @@ Wenn ich etwas in Emacs an meiner Agenda ändere und speichere, soll ein Hook au
     <span style="color:#75715e">;; Den Hook global registrieren</span>
     (add-hook <span style="color:#e6db74">&#39;after-save-hook</span> <span style="color:#a6e22e">#&#39;</span>my/org-agenda-maybe-push)
 
-<span style="color:#f92672">```</span>
+</code></pre></div><h1 id="fazit">Fazit</h1>
+<p>Um meine Termine unterwegs schnell einsehen zu können, reicht dieser Ansatz bisher. Es ist genügend automatisiert, damit ich mich auf den Prozess soweit verlassen kann. In meinem Backlog liegt aber als Todo bereits die Idee, eine richtige Caldav-Synchronisation mit Emacs gegen einen Caldav-Server einzurichten. Aber das ist noch Zukunftsmusik.</p>
 
-<span style="color:#960050;background-color:#1e0010">#</span> Fazit
-
-Um meine Termine unterwegs schnell einsehen zu können, reicht dieser Ansatz bisher. Es ist genügend automatisiert, damit ich mich auf den Prozess soweit verlassen kann. In meinem Backlog liegt aber als Todo bereits die Idee, eine richtige Caldav-Synchronisation mit Emacs gegen einen Caldav-Server einzurichten. Aber das ist noch Zukunftsmusik.
-
-</code></pre></div>
 		</div>
 	  </div>
 	
