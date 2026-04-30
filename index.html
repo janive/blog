@@ -24,6 +24,191 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/04/30/emails-in-emacs-speziell-proton.html">Emails in Emacs (speziell Proton Mail)</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/04/30/emails-in-emacs-speziell-proton.html" class="u-url"><time class="dt-published" datetime="2026-04-30 09:31:51 &#43;0200">Apr 30, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Ich hatte am 18. April kurz darüber geschrieben, dass ich meinen Proton Mail Account in Emacs eingerichtet habe. Da alles stabil läuft und ich sehr zufrieden damit bin, meine Emails in Emacs zu lesen, schreibe ich heute die Anleitung. Insbesondere in Verbindung mit Proton Mail gibt es doch ein oder zwei Dinge zu beachten.</p>
+<h2 id="vorbemerkung-zu-proton-mail">Vorbemerkung zu Proton Mail</h2>
+<p>Wie beschrieben habe ich einen Email-Account bei Proton Mail. Im Gegensatz zu anderen Emailanbietern liegen die Emails verschlüsselt auf den Servern. Es gibt keinen Weg, per IMAP auf die Emails zuzugreifen. Dafür hat Proton die Mail Bridge entwickelt. Diese Mailbridge lädt die Emails herunter und entschlüsselt sie dann lokal. Emailprogramme können dann lokal per IMAP auf die Bridge zugreifen. Die Bridge bietet auch SMTP für den Versand an.</p>
+<h2 id="vorbemerkung-zu-emacs">Vorbemerkung zu Emacs</h2>
+<p>In Emacs habe ich mich für Mu4e entschieden. Mu4e nutzt den Index, den <a href="https://github.com/djcb/mu">Mu</a> aufgebaut hat. Es ist quasi dann eine lokale Suchmaschine für die eigenen Emails. Mu4e ist dann das Frontend in Emacs um die Suche zu nutzen und auf die Emails zuzugreifen. Wie ich bereits am 18. 04. geschrieben habe, ist das alles extrem schnell. Soweit ich es verstehe, kennt Mu keine Labels wie man es von anderen Emailprovidern ggf. kennt. Es arbeitet mit Ordnern. Also eher klassisch.</p>
+<h1 id="einrichtung">Einrichtung</h1>
+<h2 id="ordner-für-die-emails-anlegen">Ordner für die Emails anlegen</h2>
+<p>Ich habe im Homeverzeichnis den Ordner <code>Mail</code> angelegt. Dieser Ordner wird später für die Speicherung der EMails verwendet.</p>
+<h2 id="proton-mail-bridge">Proton Mail Bridge</h2>
+<p>Wir müssen als erstes die Proton Mail Bridge installieren. In openSUSE Tumbleweed gibt es die Bridge nicht als natives Paket. Daher habe ich das Flatpak eingerichtet. Die Einrichtung erfolgt über einen Assistenten. Man muss sich lediglich in der Bridge einmal mit seinem Proton Mail Account anmelden. Dann beginnt die Bridge bereits die Emails herunterzuladen. Bei mir hat das sehr lange gedauert (ca. eine Stunde). Ich habe aber auch ca. 30.000 Emails in dem Postfach. Man kann aber mit der weiteren Einrichtung fortfahren und die Protonbridge im Hintergrund laufen lassen.</p>
+<p><em>Wichtig: Die Bridge sollte automatisch gestartet werden, wenn man sich am Computer anmeldet. Sonst bekommt man keine neuen Emails.</em></p>
+<p>Wir benötigen aus der Bridge noch das Zertifikat für ein weiteres Programm. Das Zertifikat kann in den „advanced settings“ unter „Export TLS certificates“ exportiert werden. Ich habe das Zertifikat in meinem Mail Ordner gespeichert. Es kann aber auch an einem anderen Ort abgelegt werden. Wir müssen den Ort für die weiteren Sync-Programme in der Konfiguration angeben. Die Daten für den Imap- und SMTP-Server sowie das Passwort benötigen wir ebenfalls gleich.</p>
+<h2 id="pakete-für-sync-mu-etc-installieren">Pakete für Sync, Mu, etc installieren</h2>
+<p>Damit wir die Emails im <code>Mail</code>-Ordner synchronisieren, verwenden wir <strong><a href="https://isync.sourceforge.io/mbsync.html">mbsync</a></strong>. Für den Versand verwenden wir <strong><a href="https://marlam.de/msmtp/">msmtp</a></strong>. Und dann benötigen wir noch <strong>Mu</strong> und <strong>Mu4e</strong>. Unter Tumbleweed sind alle Pakete im Repository vorhanden und können wie folgt installiert werden:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo zypper in isync msmtp maildir-utils w3m mu4e
+</code></pre></div><h2 id="mbsync-einrichten">mbsync einrichten</h2>
+<p>mbsync erledigt für uns die Arbeit die Emails im Mail-Verzeichnis zu synchronisieren. Damit mbsync funktioniert, benötigt es die Informationen wie Zugangsdaten zu unserer Mail-Bridge (oder Imap), Zielordner, Zertifikat, etc. Für Proton habe ich bei mir folgende Konfiguration unter <code>~./mbsyncrc ~</code> angelegt.</p>
+<pre tabindex="0"><code class="language-conf" data-lang="conf"># 1. DER ZUGANG (Dein Proton-Konto in der Bridge)
+IMAPAccount protonmail
+Host 127.0.0.1
+Port 1143
+User xxx@proton.me
+Pass yyy
+TLSType STARTTLS
+TLSVersions +1.2
+AuthMechs LOGIN
+# Hier sagen wir mbsync, dass es dem Zertifikat der Flatpak-Bridge vertrauen soll:
+CertificateFile ~/Mail/cert.pem
+
+# 2. DER FERNE SPEICHER (Proton Server via Bridge)
+IMAPStore protonmail-remote
+Account protonmail
+
+# 3. DER LOKALE SPEICHER (Dein Rechner)
+MaildirStore protonmail-local
+Subfolders Verbatim
+Path ~/Mail/
+Inbox ~/Mail/INBOX
+
+# 4. DIE VERBINDUNG (Was soll synchronisiert werden?)
+Channel protonmail
+Far :protonmail-remote:
+Near :protonmail-local:
+Patterns INBOX Drafts Sent Trash Archive Spam
+Create Near
+SyncState *
+Sync all
+Expunge Near
+Expunge Far
+</code></pre><p>Ich werde nicht sämtliche Parameter erklären. Wichtig sind aber die Patterns, Syncstate, Sync all und Expunge. Die Konfiguration sorgt so dafür, dass Emails beim Löschen in den Ordner Trash verschoben werden. Ich hatte zuerst mit direktem Löschen experimentiert. Das hat aber dann zu Dubletten geführt, da ich zwei Computer habe. Verschieben funktioniert robust. Die „gelöschten“ Emails liegen dann im Trash und werden dort von Proton nach dreißig Tagen gelöscht.</p>
+<p>Sobald mbsync eingerichtet ist, können wir den ersten Sync testen. Dazu in der Shell den Befehl <code>mbsync -a</code> eingeben. Es sollten jetzt bereits die ersten Emails aus der Proton Bridge synchronisiert und im Mail-Verzeichnis gespeichert werden.</p>
+<h2 id="mu-einrichten">Mu einrichten</h2>
+<p>Wenn mbsync eingerichtet ist, müssen wir mu einmalig initialisieren. Mit diesem Befehl in der Shell führen wir die Initialisierung durch: <code>mu init --maildir=~/Mail --my-address=jan.iversen@proton.me</code> <code>mu index</code></p>
+<h2 id="automatisierung-des-sync-und-der-indizierung">Automatisierung des Sync und der Indizierung</h2>
+<p>Damit wir einen Automatismus haben, können wir einfach einen systemd-Timer nutzen.</p>
+<p>Falls wir noch kein Verzeichnis für eigene systemd-Dienste haben, legen wir es an: <code>mkdir -p ~/.config/systemd/user/</code></p>
+<h3 id="mbsyncservice-anlegen">mbsync.service anlegen</h3>
+<p>Hier legen wir den eigentlichen Dienst an. Der Dienst wird über einen Timer gestartet. Es wird der Sync durchgeführt. Anschließend indiziert mu die Emails.</p>
+<p>Die Datei <code>~/.config/systemd/user/mbsync.service</code> erstellen</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">[<span style="color:#a6e22e">Unit</span>]
+<span style="color:#a6e22e">Description</span>=<span style="color:#a6e22e">Mail</span> <span style="color:#a6e22e">Sync</span>
+[<span style="color:#a6e22e">Service</span>]
+<span style="color:#a6e22e">Type</span>=<span style="color:#a6e22e">oneshot</span>
+<span style="color:#a6e22e">ExecStart</span>=<span style="color:#960050;background-color:#1e0010">/</span><span style="color:#a6e22e">usr</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#a6e22e">bin</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#a6e22e">mbsync</span> <span style="color:#a6e22e">-a</span>
+<span style="color:#a6e22e">ExecStartPost</span>=<span style="color:#a6e22e">-</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#a6e22e">usr</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#a6e22e">bin</span><span style="color:#960050;background-color:#1e0010">/</span><span style="color:#a6e22e">mu</span> <span style="color:#a6e22e">index</span>
+</code></pre></div><h3 id="mbsynctimer-anlegen">mbsync.timer anlegen</h3>
+<p>Der Timer sorgt dafür, dass alle fünf Minuten eine Synchronisation stattfindet.</p>
+<p>Die Datei <code>~/.config/systemd/user/mbsync.timer</code> erstellen.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">[<span style="color:#a6e22e">Unit</span>]
+<span style="color:#a6e22e">Description</span>=<span style="color:#a6e22e">Mail</span> <span style="color:#a6e22e">Sync</span> <span style="color:#a6e22e">alle</span> <span style="color:#ae81ff">5</span> <span style="color:#a6e22e">Minuten</span>
+[<span style="color:#a6e22e">Timer</span>]
+<span style="color:#a6e22e">OnBootSec</span>=<span style="color:#ae81ff">2</span><span style="color:#a6e22e">m</span>
+<span style="color:#a6e22e">OnUnitActiveSec</span>=<span style="color:#ae81ff">5</span><span style="color:#a6e22e">m</span>
+[<span style="color:#a6e22e">Install</span>]
+<span style="color:#a6e22e">WantedBy</span>=<span style="color:#a6e22e">timers</span>.<span style="color:#a6e22e">target</span>
+</code></pre></div><h3 id="timer-aktivieren">Timer aktivieren</h3>
+<p>Diesen Befehl einmalig ausführen. Systemd aktiviert dann den Timer sofort.</p>
+<p><code>systemctl --user enable --now mbsync.timer</code></p>
+<h2 id="emails-versenden">Emails versenden</h2>
+<p>Wir wollen auch Emails versenden. Dafür verwenden wir msmtp. Das Programm sendet lokal die Mails an die Protonbridge. Und diese erledigt dann den Rest für uns. Hier benötigen wir ebenfalls eine Konfiguration. Die Konfiguration liegt unter <code>~/.msmtprc</code></p>
+<pre tabindex="0"><code class="language-conf" data-lang="conf"># Standardeinstellungen für alle Konten
+defaults
+auth           on
+tls            on
+tls_starttls   on
+# Hier nutzen wir wieder dein exportiertes Zertifikat
+tls_trust_file ~/Mail/cert.pem
+logfile        ~/.msmtp.log
+
+# Dein Proton-Konto via Bridge
+account        protonmail
+host           127.0.0.1
+port           1025
+from           &quot;xxx@proton.me&quot;
+user           &quot;xxx@proton.me&quot;
+passwordeval   &quot;echo 'yyy'&quot;
+
+# Dieses Konto als Standard setzen
+account default : protonmail
+</code></pre><p>Auch msmtp benötigt den Ort des Zertifikats sowie die Zugangsdaten der Proton Mail Bridge.</p>
+<h2 id="konfiguration-in-emacs">Konfiguration in Emacs</h2>
+<p>Ich kopiere hier einfach meine Konfiguration. Das ist teilweise durch KI generiert oder übernommene Parameter aus anderen Blogs. Für mich funktioniert die Konfiguration so sehr gut.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-emacs-lisp" data-lang="emacs-lisp">  (use-package mu4e
+    :ensure <span style="color:#66d9ef">nil</span> <span style="color:#75715e">; Wir nutzen das Systempaket von openSUSE</span>
+    :config
+    <span style="color:#75715e">;; --- GRUNDLAGEN ---</span>
+
+    <span style="color:#75715e">;; Sagt Emacs, wo dein Haupt-Mail-Ordner liegt.</span>
+    (setq mu4e-maildir <span style="color:#e6db74">&#34;~/Mail&#34;</span>)
+
+    <span style="color:#75715e">;; Intervall für Emailcheck</span>
+    (setq mu4e-update-interval <span style="color:#ae81ff">300</span>)
+
+    <span style="color:#75715e">;; Sent-Mails löschen</span>
+    (setq mu4e-sent-messages-behavior <span style="color:#e6db74">&#39;delete</span>)
+
+    <span style="color:#75715e">;; --- DEINE IDENTITÄT ---</span>
+
+    (setq user-mail-address <span style="color:#e6db74">&#34;jan.iversen@proton.me&#34;</span>
+          <span style="color:#a6e22e">user-full-name</span> <span style="color:#e6db74">&#34;Jan Iversen&#34;</span>)
+
+    <span style="color:#75715e">;; --- ORDNER-STRUKTUR (Proton-Standard) ---</span>
+
+    <span style="color:#75715e">;; Hier definieren wir, welche Ordner für was zuständig sind.</span>
+    <span style="color:#75715e">;; Das &#34;mu4e-maildir-shortcuts&#34; erlaubt dir, mit &#39;j&#39; und </span>
+    <span style="color:#75715e">;; dann dem Buchstaben (z.B. &#39;i&#39;) blitzschnell zu springen.</span>
+    (setq mu4e-maildir-shortcuts
+          <span style="color:#f92672">&#39;</span>((<span style="color:#e6db74">&#34;/INBOX&#34;</span>   <span style="color:#f92672">.</span> <span style="color:#e6db74">?i</span>)
+            (<span style="color:#e6db74">&#34;/Sent&#34;</span>    <span style="color:#f92672">.</span> <span style="color:#e6db74">?s</span>)
+            (<span style="color:#e6db74">&#34;/Trash&#34;</span>   <span style="color:#f92672">.</span> <span style="color:#e6db74">?t</span>)
+            (<span style="color:#e6db74">&#34;/Drafts&#34;</span>  <span style="color:#f92672">.</span> <span style="color:#e6db74">?d</span>)
+              (<span style="color:#e6db74">&#34;/Archive&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">?a</span>)))
+
+    <span style="color:#75715e">;; --- VERSAND (msmtp) ---</span>
+
+    <span style="color:#75715e">;; Hier sagen wir Emacs, dass es msmtp zum Verschicken nutzen soll.</span>
+    (setq send-mail-function <span style="color:#e6db74">&#39;sendmail-send-it</span>
+          sendmail-program <span style="color:#e6db74">&#34;/usr/bin/msmtp&#34;</span>
+          message-sendmail-f-is-evil <span style="color:#66d9ef">t</span>
+          message-sendmail-extra-arguments <span style="color:#f92672">&#39;</span>(<span style="color:#e6db74">&#34;--read-envelope-from&#34;</span>))
+
+    <span style="color:#75715e">;; --- KOMFORT ---</span>
+
+    <span style="color:#75715e">;; Bilder direkt in der Mail anzeigen (schön auf deinem Ultrawide!)</span>
+    (setq mu4e-view-show-images <span style="color:#66d9ef">t</span>)
+
+    <span style="color:#75715e">;; HTML-Mails schick im Emacs-Puffer anzeigen</span>
+    (setq mu4e-html2text-command <span style="color:#e6db74">&#34;w3m -T text/html&#34;</span>))
+
+  <span style="color:#75715e">;; Anzahl ungelesene Emails in Modeline anzeigen</span>
+  (mu4e-modeline-mode <span style="color:#ae81ff">1</span>)
+  (add-hook <span style="color:#e6db74">&#39;mu4e-index-updated-hook</span> <span style="color:#a6e22e">#&#39;force-mode-line-update</span>)
+  (setq mu4e-sent-folder   <span style="color:#e6db74">&#34;/Sent&#34;</span>
+      mu4e-drafts-folder <span style="color:#e6db74">&#34;/Drafts&#34;</span>
+      mu4e-trash-folder  <span style="color:#e6db74">&#34;/Trash&#34;</span>
+      mu4e-refile-folder <span style="color:#e6db74">&#34;/Archive&#34;</span>)
+<span style="color:#75715e">;; Proton ist zickig beim Löschen</span>
+(setq mu4e-change-filenames-when-moving <span style="color:#66d9ef">t</span>)
+(setq mu4e-trash-without-flag <span style="color:#66d9ef">t</span>)
+(setq mu4e-headers-leave-behavior <span style="color:#e6db74">&#39;apply</span>)
+</code></pre></div><p>Wichtig sind die letzten drei Parameter für Proton. Ich verstehe nicht genau, was eigentlich im Hintergrund geschieht. Aber wenn alles so konfiguriert ist, funktioniert das „Löschen“, also Verschieben einer Email in Trash, zuverlässig.</p>
+<h2 id="abschluss">Abschluss</h2>
+<p>Wenn alles eingerichtet ist, Emacs einmal neu starten. Über Alt+x mu4e starten und sich (hoffentlich) freuen, dass Emails im Dashboard angezeigt werden. Ab da verweise ich dann auf die Dokumentation für mu4e für die Bedienung. Am besten den Versand einer Email einmal testen und prüfen, ob alles korrekt ankommt. Bei mir hat es (bis auf das Löschen von Mails) sofort funktioniert. Und teste dann einmal die Suche, wenn alle Emails synchronisiert sind.</p>
+<h1 id="fazit">Fazit</h1>
+<p>Für mich funktioniert die Emailverwaltung in Emacs wunderbar. Es ist rasend schnell. HTML-Emails werden auch gut dargestellt und sind sogar entspannter zu lesen. Emacs bereinigt quasi die HTML-Mails und man kann sich auf den Inhalt konzentrieren. Wenn Emacs geschlossen ist, läuft dennoch der Sync und die Indizierung. Dadurch sind lokal alle Daten aktuell. Der einzige „Wermutstropfen“&hellip; es kann durch die Intervalle durchaus einige Minuten dauern, bis in Emacs eine Email angezeigt wird. Ich kann damit leben. Falls mal ein 2FA-Code per Email gesendet wird, den ich wirklich sofort benötige, schaue ich entweder auf das Smartphone oder stoße den Sync kurz manuell an. Aber wie oft kommt das wirklich vor. Mich entschleunigt das Lesen der Emails in Emacs sehr. Und ich kann jetzt Emails mit TODOs in orgmode verknüpfen.</p>
+<h1 id="links">Links</h1>
+<ul>
+<li><a href="https://flathub.org/de/apps/ch.protonmail.protonmail-bridge">Proton Mail Bridge in Flathub</a></li>
+<li><a href="https://www.djcbsoftware.nl/code/mu/">Mu</a></li>
+<li><a href="https://www.djcbsoftware.nl/code/mu/mu4e.html">Mu4e</a></li>
+<li><a href="https://isync.sourceforge.io/mbsync.html">mbsync</a></li>
+<li><a href="https://marlam.de/msmtp/">msmtp</a></li>
+</ul>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 
 		<a href="https://jan-iversen.de/2026/04/19/kleiner-nachtrag-zu-dem-aura.html" class="u-url"><time class="dt-published" datetime="2026-04-19 17:38:10 &#43;0200">Apr 19, 2026</time></a>
 
@@ -425,7 +610,7 @@ wifi.backend=iwd
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/03/07/wir-waren-schon-fleiig-und.html" class="u-url"><time class="dt-published" datetime="2026-03-07 11:50:33 &#43;0100">Mar 7, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/07/wir-waren-schon-fleiig-und.html" class="u-url"><time class="dt-published" datetime="2026-03-07 12:50:33 &#43;0200">Mar 7, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Wir waren schon fleißig und sind heute morgen spazieren gewesen. Herrliche Luft und der Kopf ist jetzt frei.</p>
@@ -437,7 +622,7 @@ wifi.backend=iwd
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/03/07/gestern-habe-ich-noch-die.html" class="u-url"><time class="dt-published" datetime="2026-03-07 05:34:13 &#43;0100">Mar 7, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/07/gestern-habe-ich-noch-die.html" class="u-url"><time class="dt-published" datetime="2026-03-07 06:34:13 &#43;0200">Mar 7, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Gestern habe ich noch die Datenbank des Matrixservers von SQLite auf PostgreSQL migriert. Nach einigen Anlaufschwierigkeiten hat es dann doch funktioniert.</p>
@@ -452,7 +637,7 @@ Es gibt noch einiges zu lernen.</p>
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/03/05/wieder-zurck-zu-ubuntu-das.html" class="u-url"><time class="dt-published" datetime="2026-03-05 07:41:38 &#43;0100">Mar 5, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/05/wieder-zurck-zu-ubuntu-das.html" class="u-url"><time class="dt-published" datetime="2026-03-05 08:41:38 &#43;0200">Mar 5, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Wieder zurück zu Ubuntu&hellip; das ist die einzige Distribution, die auf meinem Thinkpad stabil läuft. Interessanterweise gibt es sogar einen angepassten Kernel für das Gerät. Alle anderen Distributionen mit einem Kernel &gt; 6.17 haben eine Kernelpanic, wenn das Gerät aus dem Standby geweckt wird.</p>
@@ -466,7 +651,7 @@ Es gibt noch einiges zu lernen.</p>
 			<h1><a href="https://jan-iversen.de/2026/03/03/willkommen-in-der-matrix.html">Willkommen in der Matrix</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2026/03/03/willkommen-in-der-matrix.html" class="u-url"><time class="dt-published" datetime="2026-03-03 13:18:01 &#43;0100">Mar 3, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/03/03/willkommen-in-der-matrix.html" class="u-url"><time class="dt-published" datetime="2026-03-03 14:18:01 &#43;0200">Mar 3, 2026</time></a>
 
 		<div class="e-content">
 			 <h1 id="willkommen-in-der-matrix">Willkommen in der Matrix</h1>
@@ -509,7 +694,7 @@ Einige Freunde sind auch auf dem Server und testen ein wenig. Jetzt geht es dara
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/02/04/neues-spielzeug.html" class="u-url"><time class="dt-published" datetime="2026-02-04 18:22:31 &#43;0100">Feb 4, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/02/04/neues-spielzeug.html" class="u-url"><time class="dt-published" datetime="2026-02-04 19:22:31 &#43;0200">Feb 4, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Neues Spielzeug</p>
@@ -521,7 +706,7 @@ Einige Freunde sind auch auf dem Server und testen ein wenig. Jetzt geht es dara
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2026/01/17/aktuelle-linuxdistribution-debian-trixie.html" class="u-url"><time class="dt-published" datetime="2026-01-17 05:38:09 &#43;0100">Jan 17, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/01/17/aktuelle-linuxdistribution-debian-trixie.html" class="u-url"><time class="dt-published" datetime="2026-01-17 06:38:09 &#43;0200">Jan 17, 2026</time></a>
 
 		<div class="e-content">
 			 <p>Aktuelle Linuxdistribution - Debian Trixie</p>
@@ -535,7 +720,7 @@ Einige Freunde sind auch auf dem Server und testen ein wenig. Jetzt geht es dara
 			<h1><a href="https://jan-iversen.de/2026/01/17/inkscape-svg-aus-pixelgrafiken-fr.html">Inkscape - SVG aus Pixelgrafiken für Plotter erzeugen</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2026/01/17/inkscape-svg-aus-pixelgrafiken-fr.html" class="u-url"><time class="dt-published" datetime="2026-01-17 05:33:09 &#43;0100">Jan 17, 2026</time></a>
+		<a href="https://jan-iversen.de/2026/01/17/inkscape-svg-aus-pixelgrafiken-fr.html" class="u-url"><time class="dt-published" datetime="2026-01-17 06:33:09 &#43;0200">Jan 17, 2026</time></a>
 
 		<div class="e-content">
 			 <h1 id="ausgangssituation">Ausgangssituation</h1>
@@ -736,7 +921,7 @@ Eine Erklärung der anderen Parameter findet man auf der Inkscape-Seite: <a href
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/12/24/heute-mit-der-partnerin-die.html" class="u-url"><time class="dt-published" datetime="2025-12-24 19:08:11 &#43;0100">Dec 24, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/12/24/heute-mit-der-partnerin-die.html" class="u-url"><time class="dt-published" datetime="2025-12-24 20:08:11 &#43;0200">Dec 24, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Heute mit der Partnerin die ersten Sticker gedruckt und im Plotter geschnitten. Ich lerne langsam mit Canva umzugehen&hellip;.</p>
@@ -750,7 +935,7 @@ Eine Erklärung der anderen Parameter findet man auf der Inkscape-Seite: <a href
 			<h1><a href="https://jan-iversen.de/2025/12/21/manchmal-muss-man-die-niederlage.html">Manchmal muss man die Niederlage eingestehen</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/12/21/manchmal-muss-man-die-niederlage.html" class="u-url"><time class="dt-published" datetime="2025-12-21 10:11:50 &#43;0100">Dec 21, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/12/21/manchmal-muss-man-die-niederlage.html" class="u-url"><time class="dt-published" datetime="2025-12-21 11:11:50 &#43;0200">Dec 21, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich habe jetzt einige Zeit Arch verwendet. Und es ist einiges an Arbeit, Zeit und Mühe reingeflossen. Aber ich musste für mich erkennen, dass Arch für mich zu viel Zeit und Energie kostet. Um es kurz zu machen… ich habe auf beiden Rechnern vorerst wieder Linux Mint installiert.</p>
@@ -778,7 +963,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 			<h1><a href="https://jan-iversen.de/2025/12/03/kanbanschulung.html">Kanban-Schulung</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/12/03/kanbanschulung.html" class="u-url"><time class="dt-published" datetime="2025-12-03 20:21:55 &#43;0100">Dec 3, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/12/03/kanbanschulung.html" class="u-url"><time class="dt-published" datetime="2025-12-03 21:21:55 &#43;0200">Dec 3, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Die letzten drei Tage war ich in Hamburg bei it-agile zur Schulung. Drei Tage durfte ich meine Kenntnisse in Bezug auf Kanban erweitern und vertiefen. Jetzt habe ich die Abschlüsse für Kanban System Improvement und Kanban for Design and Innovation. Wir haben bei uns im Team vor gut 1,5 Jahren Kanban eingeführt und sind mit der Methode bisher sehr erfolgreich. Viel mehr will ich da aus diversen Gründen nicht in die Tiefe gehen. Aber ich kann vielleicht beschreiben, was die Methode mit mir gemacht hat.</p>
@@ -793,7 +978,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/12/03/heute-ist-mein-dritter-und.html" class="u-url"><time class="dt-published" datetime="2025-12-03 08:52:23 &#43;0100">Dec 3, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/12/03/heute-ist-mein-dritter-und.html" class="u-url"><time class="dt-published" datetime="2025-12-03 09:52:23 &#43;0200">Dec 3, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Heute ist mein dritter und letzter Tag der Kanban-Schulung</p>
@@ -805,7 +990,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/12/02/zweiter-tag-der-kanbanschulung.html" class="u-url"><time class="dt-published" datetime="2025-12-02 08:57:01 &#43;0100">Dec 2, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/12/02/zweiter-tag-der-kanbanschulung.html" class="u-url"><time class="dt-published" datetime="2025-12-02 09:57:01 &#43;0200">Dec 2, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Zweiter Tag der Kanban-Schulung.</p>
@@ -817,7 +1002,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/11/29/ich-glaube-ich-hre-fr.html" class="u-url"><time class="dt-published" datetime="2025-11-29 13:37:55 &#43;0100">Nov 29, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/29/ich-glaube-ich-hre-fr.html" class="u-url"><time class="dt-published" datetime="2025-11-29 14:37:55 &#43;0200">Nov 29, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich glaube, ich höre für heute mit dem Ricing auf. Das war gar nicht so geplant. Aber als ich angefangen&hellip; konnte ich mich kaum stoppen. Aber ich bin jetzt sehr zufrieden. Sway nutzt grundsätzlich die Farben des Gruvbox-Themas. Mein Terminal ebenso. Nebenbei dann noch mpd als Musikdienst eingerichtet&hellip;. Ich bin sehr zufrieden :-)</p>
@@ -829,7 +1014,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/11/29/noch-etwas-am-theme-gebastelt.html" class="u-url"><time class="dt-published" datetime="2025-11-29 11:52:51 &#43;0100">Nov 29, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/29/noch-etwas-am-theme-gebastelt.html" class="u-url"><time class="dt-published" datetime="2025-11-29 12:52:51 &#43;0200">Nov 29, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Noch etwas am Theme gebastelt. Ich bin sehr zufrieden.</p>
@@ -841,7 +1026,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/11/29/ich-habe-mal-angefangen-sway.html" class="u-url"><time class="dt-published" datetime="2025-11-29 10:41:34 &#43;0100">Nov 29, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/29/ich-habe-mal-angefangen-sway.html" class="u-url"><time class="dt-published" datetime="2025-11-29 11:41:34 &#43;0200">Nov 29, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich habe mal angefangen Sway zu benutzen. Ein Tiling-Window-Manager.</p>
@@ -853,7 +1038,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/11/20/erinnert-ihr-euch-noch-an.html" class="u-url"><time class="dt-published" datetime="2025-11-20 18:58:46 &#43;0100">Nov 20, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/20/erinnert-ihr-euch-noch-an.html" class="u-url"><time class="dt-published" datetime="2025-11-20 19:58:46 &#43;0200">Nov 20, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Erinnert ihr euch noch an meinen Artikel über den <a href="https://jan-iversen.de/2025/10/08/ich-muss-meinen-fhrerschein-tauschen.html">Führerscheintausch</a>? Ich habe Post bekommen. Ich darf zu meinem Bürgerbüro und den Führerschein abholen. Ich war ja doch sehr skeptisch, ob es wirklich klappt. Umso mehr freue ich mich, dass die Führerscheinstelle viel schneller als auf der Homepage angegeben, den Vorgang bearbeitet hat. Selbst auf meine Nachfrage, ob der Antrag eingegangen ist, haben sie sehr schnell reagiert. Jetzt muss ich nur irgendwann einmal während der Öffnungszeiten über die Straße zum Rathaus gehen und die Sache ist erledigt.</p>
@@ -866,7 +1051,7 @@ Also bleibt es bei Linux. Mit all seinen Fehlern, Macken, Marotten. Immerhin hab
 			<h1><a href="https://jan-iversen.de/2025/11/20/wieder-bei-arch.html">Wieder bei Arch</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/11/20/wieder-bei-arch.html" class="u-url"><time class="dt-published" datetime="2025-11-20 18:39:14 &#43;0100">Nov 20, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/20/wieder-bei-arch.html" class="u-url"><time class="dt-published" datetime="2025-11-20 19:39:14 &#43;0200">Nov 20, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Oh je… meine Erfahrungen mit dem neuen Thinkpad sind spannend. Und um es vorwegzunehmen, ich bin wieder bei Arch auf dem Thinkpad.</p>
@@ -891,7 +1076,7 @@ Und dann noch etwas anders. Liebe Entwickler. Ihr beklagt euch alle, dass ihr so
 			<h1><a href="https://jan-iversen.de/2025/11/08/aur-mal-wieder-offline.html">AUR mal wieder offline</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/11/08/aur-mal-wieder-offline.html" class="u-url"><time class="dt-published" datetime="2025-11-08 07:59:39 &#43;0100">Nov 8, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/08/aur-mal-wieder-offline.html" class="u-url"><time class="dt-published" datetime="2025-11-08 08:59:39 &#43;0200">Nov 8, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich habe gerade den PC gestartet. Während ich gemütlich eine Tasse Getreidekaffee trinke, wollte ich kurz die Updates in Arch installieren. Ich verwende dafür paru als AUR-Helper. Paru installiert zum einen die Updates aus dem Arch-Repository (also wie pacman -Syu) und prüft danach die installierten Pakete aus dem Arch User Repository (AUR) und aktualisiert sie. Heute ist leider mal wieder das AUR nicht erreichbar. Paru aktualisiert dann nur die offiziellen Arch-Pakete.</p>
@@ -907,7 +1092,7 @@ Und dann noch etwas anders. Liebe Entwickler. Ihr beklagt euch alle, dass ihr so
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/11/08/das-neue-thinkpad-ist-jetzt.html" class="u-url"><time class="dt-published" datetime="2025-11-08 06:27:39 &#43;0100">Nov 8, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/08/das-neue-thinkpad-ist-jetzt.html" class="u-url"><time class="dt-published" datetime="2025-11-08 07:27:39 &#43;0200">Nov 8, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Das neue Thinkpad ist jetzt auch dekoriert.</p>
@@ -921,7 +1106,7 @@ Und dann noch etwas anders. Liebe Entwickler. Ihr beklagt euch alle, dass ihr so
 			<h1><a href="https://jan-iversen.de/2025/11/05/debian-ist-installiert.html">Debian ist installiert....</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/11/05/debian-ist-installiert.html" class="u-url"><time class="dt-published" datetime="2025-11-05 20:12:15 &#43;0100">Nov 5, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/05/debian-ist-installiert.html" class="u-url"><time class="dt-published" datetime="2025-11-05 21:12:15 &#43;0200">Nov 5, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Das war spannend. Ich hatte gestern geschrieben, dass der Debian-Installer immer mit einer Kernelpanic sich verabschiedet. Aber manchmal bin ich hartnäckig und gebe nicht auf. Ich konnte Debian von einer Live-Iso starten. Dort konnte ich erfolgreich eine Verbindung zu meinem WLAN-Router herstellen. Die Installation mit dem Calamares-Installer war problemlos.
@@ -935,7 +1120,7 @@ Jetzt ist Debian auf dem neuen Thinkpad soweit eingerichtet, dass ich das Gerät
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/11/04/gestern-kam-das-neue-thinkpad.html" class="u-url"><time class="dt-published" datetime="2025-11-04 19:30:22 &#43;0100">Nov 4, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/04/gestern-kam-das-neue-thinkpad.html" class="u-url"><time class="dt-published" datetime="2025-11-04 20:30:22 &#43;0200">Nov 4, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Gestern kam das neue Thinkpad an. Ein T15 Gen 5 mit AMD-CPU. Sehr schönes Gerät. Debian lässt sich leider nicht installieren. Während der Erkennung der Netzwerkkarten wird eine Kernel-Panik ausgelöst. Also wurde Arch installiert. Einige Kleinigkeiten müssen noch eingerichtet werden, aber das meiste ist fertig. Und das läuft erste Sahne.</p>
@@ -963,7 +1148,7 @@ Jetzt ist Debian auf dem neuen Thinkpad soweit eingerichtet, dass ich das Gerät
 			<h1><a href="https://jan-iversen.de/2025/11/01/163349.html">Debian - Hardewaredekodierung für Videowiedergabe in chromium-basierte Browser einrichten.</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/11/01/163349.html" class="u-url"><time class="dt-published" datetime="2025-11-01 16:33:49 &#43;0100">Nov 1, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/11/01/163349.html" class="u-url"><time class="dt-published" datetime="2025-11-01 17:33:49 &#43;0200">Nov 1, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Heute ein kleiner Tipp. Kurz zum Hintergrund: ich habe ein neues Thinkpad bestellt. Bisher habe ich Arch auf dem bisherigen Gerät installiert. Ich werde das Gerät vorerst nur noch selten nutzen. So weit ich weiß, kann es bei Arch irgendwann ggf. Probleme geben, wenn dann nach langer Zeit die Updates installiert werden sollen. Daher habe ich das Gerät gestern bereits auf Debian 13 Trixie umgestellt. Dabei ist mir aufgefallen, dass sowohl Vivaldi wie auch Brave nicht auf die im Arch-Wiki benannte Konfiguration für Flags reagieren (siehe <a href="https://wiki.archlinux.org/title/Vivaldi#Making_flags_persistent">Vivaldi - Make flags persistent</a>). Das scheint zumindest bei Vivaldi eine Änderung zu sein, die Arch selber in das Paket integriert hat.</p>
@@ -984,7 +1169,7 @@ Jetzt ist Debian auf dem neuen Thinkpad soweit eingerichtet, dass ich das Gerät
 			<h1><a href="https://jan-iversen.de/2025/10/30/kein-kaffee-mehr.html">Kein Kaffee mehr…</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/10/30/kein-kaffee-mehr.html" class="u-url"><time class="dt-published" datetime="2025-10-30 18:21:15 &#43;0100">Oct 30, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/30/kein-kaffee-mehr.html" class="u-url"><time class="dt-published" datetime="2025-10-30 19:21:15 &#43;0200">Oct 30, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Vor gut zwei Wochen haben mich hartnäckige Halsschmerzen geplagt. Da ich also eh krank war und das Schlucken weh getan hat, habe ich mich entschlossen keinen Kaffee mehr zu trinken. Heute schreibe ich ein wenig, wie es mir nach etwa zwei Wochen ohne Kaffee geht.</p>
@@ -1006,7 +1191,7 @@ Außerdem geht es mir körperlich und auch geistig aktuell viel besser. Ich füh
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/29/hre-gerade-das-album-discovery.html" class="u-url"><time class="dt-published" datetime="2025-10-29 20:27:04 &#43;0100">Oct 29, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/29/hre-gerade-das-album-discovery.html" class="u-url"><time class="dt-published" datetime="2025-10-29 21:27:04 &#43;0200">Oct 29, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Höre gerade das Album Discovery von Daft Punk. Ein musikalisches Highlight für mich :-)</p>
@@ -1019,7 +1204,7 @@ Außerdem geht es mir körperlich und auch geistig aktuell viel besser. Ich füh
 			<h1><a href="https://jan-iversen.de/2025/10/29/warum-benutze-ich-xfce.html">Warum benutze ich XFCE?</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/10/29/warum-benutze-ich-xfce.html" class="u-url"><time class="dt-published" datetime="2025-10-29 19:50:49 &#43;0100">Oct 29, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/29/warum-benutze-ich-xfce.html" class="u-url"><time class="dt-published" datetime="2025-10-29 20:50:49 &#43;0200">Oct 29, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich hatte geschrieben, dass ich aktuell XFCE unter Arch verwende. Bevor ich erkläre, was ich an XFCE so mag, erkläre ich vielleicht erst einmal, was XFCE überhaupt ist.</p>
@@ -1064,7 +1249,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/24/linkedin-mchte-mit-den-inhalten.html" class="u-url"><time class="dt-published" datetime="2025-10-24 06:22:48 &#43;0100">Oct 24, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/24/linkedin-mchte-mit-den-inhalten.html" class="u-url"><time class="dt-published" datetime="2025-10-24 07:22:48 &#43;0200">Oct 24, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Linkedin möchte mit den Inhalten KIs trainieren&hellip; wenn ich mein Linkedin-Account öffne und mir die Beiträge so anschaue, würde ich sagen&hellip; die sind sehr oft durch KI geschrieben worden.</p>
@@ -1077,7 +1262,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/22/wenn-die-partnerin-einen-plotter.html" class="u-url"><time class="dt-published" datetime="2025-10-22 18:43:27 &#43;0100">Oct 22, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/22/wenn-die-partnerin-einen-plotter.html" class="u-url"><time class="dt-published" datetime="2025-10-22 19:43:27 &#43;0200">Oct 22, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Wenn die Partnerin einen Plotter hat und Sticker drucken kann&hellip; das muss man nutzen</p>
@@ -1089,7 +1274,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/21/btw-neun-tage-seit-der.html" class="u-url"><time class="dt-published" datetime="2025-10-21 18:41:39 &#43;0100">Oct 21, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/21/btw-neun-tage-seit-der.html" class="u-url"><time class="dt-published" datetime="2025-10-21 19:41:39 &#43;0200">Oct 21, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Btw&hellip; Neun Tage seit der Installation und Arch ist noch nicht kaputt&hellip;</p>
@@ -1103,7 +1288,7 @@ Ja… ich habe ein graues Theme eingerichtet. Die modernen, weißen oder gar dun
 			<h1><a href="https://jan-iversen.de/2025/10/21/ai-und-ich.html">AI und ich</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/10/21/ai-und-ich.html" class="u-url"><time class="dt-published" datetime="2025-10-21 18:19:41 &#43;0100">Oct 21, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/21/ai-und-ich.html" class="u-url"><time class="dt-published" datetime="2025-10-21 19:19:41 &#43;0200">Oct 21, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich bin schon einige Male gefragt worden, ob meine Blogeinträge wirklich selber von mir geschrieben worden sind. Und ich kann sagen: ja. Sämtliche Texte sind von mir verfasst. Ich nutze ein LLM lediglich noch einmal zum Korrekturlesen. Aber die Frage ist schon seltsam. Ich schreibe einen Blogeintrag und jemand fragt dann, ob ich den geschrieben habe. Mir gibt das schon zu denken. Heute will ich ein wenig über meine Erfahrung und auch Meinung zu KI schreiben.</p>
@@ -1146,7 +1331,7 @@ Das sollen meine Gedanken zu KI sein. Die Idee kam mir vorhin, als ich eben dies
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/14/der-d-drucker-druckt-bereits.html" class="u-url"><time class="dt-published" datetime="2025-10-14 18:59:37 &#43;0100">Oct 14, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/14/der-d-drucker-druckt-bereits.html" class="u-url"><time class="dt-published" datetime="2025-10-14 19:59:37 &#43;0200">Oct 14, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Der 3D Drucker druckt bereits die erste Christbaumkugel.</p>
@@ -1160,7 +1345,7 @@ Das sollen meine Gedanken zu KI sein. Die Idee kam mir vorhin, als ich eben dies
 			<h1><a href="https://jan-iversen.de/2025/10/13/zurck-zu-arch.html">Zurück zu Arch</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/10/13/zurck-zu-arch.html" class="u-url"><time class="dt-published" datetime="2025-10-13 20:00:05 &#43;0100">Oct 13, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/13/zurck-zu-arch.html" class="u-url"><time class="dt-published" datetime="2025-10-13 21:00:05 &#43;0200">Oct 13, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Mein Vorsatz, Ubuntu bis Ende Oktober zu nutzen, habe ich am Wochenende verworfen. Der Drang zu Wechseln war zu stark und es gab doch die ein oder andere Sache, die mich an Ubuntu gestört hat.</p>
@@ -1186,7 +1371,7 @@ Also… ein System, welches meine Wünsche nicht beachtet, möchte ich nicht.</p
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/11/i-use-arch-btw.html" class="u-url"><time class="dt-published" datetime="2025-10-11 14:11:56 &#43;0100">Oct 11, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/11/i-use-arch-btw.html" class="u-url"><time class="dt-published" datetime="2025-10-11 15:11:56 &#43;0200">Oct 11, 2025</time></a>
 
 		<div class="e-content">
 			 <p>I use Arch, btw</p>
@@ -1198,7 +1383,7 @@ Also… ein System, welches meine Wünsche nicht beachtet, möchte ich nicht.</p
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/09/heute-wird-ubuntu-verffentlicht-und.html" class="u-url"><time class="dt-published" datetime="2025-10-09 06:13:31 &#43;0100">Oct 9, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/09/heute-wird-ubuntu-verffentlicht-und.html" class="u-url"><time class="dt-published" datetime="2025-10-09 07:13:31 &#43;0200">Oct 9, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Heute wird Ubuntu 25.10 veröffentlicht. Und ja&hellip; noch habe ich auf beiden Computern Ubuntu im Einsatz. Auf dem Laptop ist bereits 25.10 installiert und es läuft sehr unauffällig.</p>
@@ -1212,7 +1397,7 @@ Also… ein System, welches meine Wünsche nicht beachtet, möchte ich nicht.</p
 			<h1><a href="https://jan-iversen.de/2025/10/08/ich-muss-meinen-fhrerschein-tauschen.html">Ich muss meinen Führerschein tauschen</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/10/08/ich-muss-meinen-fhrerschein-tauschen.html" class="u-url"><time class="dt-published" datetime="2025-10-08 17:16:27 &#43;0100">Oct 8, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/08/ich-muss-meinen-fhrerschein-tauschen.html" class="u-url"><time class="dt-published" datetime="2025-10-08 18:16:27 &#43;0200">Oct 8, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Diejenigen, die einen Führerschein haben, trifft es früher oder später. Wir dürfen den Führerschein austauschen. Ich habe mich jetzt darum gekümmert. Wobei… ich habe nur den ersten Schritt erledigt. Und das lässt mich schon wieder an der Digitalisierung von Behörden zweifeln.</p>
@@ -1240,7 +1425,7 @@ Würde ich so bei mir in der Firma Anforderungen an die Entwicklung bearbeiten�
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/10/06/lektre-fr-die-nchste-zeit.html" class="u-url"><time class="dt-published" datetime="2025-10-06 15:30:15 &#43;0100">Oct 6, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/06/lektre-fr-die-nchste-zeit.html" class="u-url"><time class="dt-published" datetime="2025-10-06 16:30:15 &#43;0200">Oct 6, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Lektüre für die nächste Zeit.</p>
@@ -1254,7 +1439,7 @@ Würde ich so bei mir in der Firma Anforderungen an die Entwicklung bearbeiten�
 			<h1><a href="https://jan-iversen.de/2025/10/05/ich-spiele-zur-zeit-stardew.html">Ich spiele zur Zeit Stardew Valley</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/10/05/ich-spiele-zur-zeit-stardew.html" class="u-url"><time class="dt-published" datetime="2025-10-05 11:12:18 &#43;0100">Oct 5, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/10/05/ich-spiele-zur-zeit-stardew.html" class="u-url"><time class="dt-published" datetime="2025-10-05 12:12:18 &#43;0200">Oct 5, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich gebe zu… ich bin ein Casual Gamer. Ich mag es nicht, wenn Spiele eine sehr komplizierte Mechanik haben oder ich besonders geschickt sein muss. Mich frustriert das eher und ich lege die Spiele sehr schnell wieder beiseite. Ein Spiel ist für mich gut, wenn es eine spannende Geschichte hat. Oder wenn ich stundenlang gemütlich einer Tätigkeit wie z. B. Angeln oder Bergbau nachgehen kann.</p>
@@ -1271,7 +1456,7 @@ Würde ich so bei mir in der Firma Anforderungen an die Entwicklung bearbeiten�
 			<h1><a href="https://jan-iversen.de/2025/09/30/wenn-der-endgegner-in-runde.html">Wenn der Endgegner in Runde 2 stirbt: Gedanken eines Spielleiters</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/09/30/wenn-der-endgegner-in-runde.html" class="u-url"><time class="dt-published" datetime="2025-09-30 18:08:41 &#43;0100">Sep 30, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/30/wenn-der-endgegner-in-runde.html" class="u-url"><time class="dt-published" datetime="2025-09-30 19:08:41 &#43;0200">Sep 30, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Aktuell leite ich zwei Dungeons and Dragons-Kampagnen. Einmal “Curse of Strahd”, die gerade begonnen hat und dann noch die Erweiterungen zu “Dragon of Icespire Peak”. Gestern hatten wir eine gemeinsame Session zur zweiten Kampagne. Ich will heute ein wenig von dem Kampf und der Schwierigkeit des Balancing und Frustation schreiben.</p>
@@ -1297,7 +1482,7 @@ Die Gegner sind im Abenteuer vorgegeben und es gibt auch Hinweise für die Kämp
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/09/28/manchmal-muss-man-kurz-innehalten.html" class="u-url"><time class="dt-published" datetime="2025-09-28 08:50:13 &#43;0100">Sep 28, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/28/manchmal-muss-man-kurz-innehalten.html" class="u-url"><time class="dt-published" datetime="2025-09-28 09:50:13 &#43;0200">Sep 28, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Manchmal muss man kurz innehalten und auf seine Umgebung achten.</p>
@@ -1309,7 +1494,7 @@ Die Gegner sind im Abenteuer vorgegeben und es gibt auch Hinweise für die Kämp
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/09/28/kurzer-tipp-fr-ubuntu-mir.html" class="u-url"><time class="dt-published" datetime="2025-09-28 07:41:15 &#43;0100">Sep 28, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/28/kurzer-tipp-fr-ubuntu-mir.html" class="u-url"><time class="dt-published" datetime="2025-09-28 08:41:15 &#43;0200">Sep 28, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Kurzer Tipp für Ubuntu.</p>
@@ -1326,7 +1511,7 @@ Die Gegner sind im Abenteuer vorgegeben und es gibt auch Hinweise für die Kämp
 			<h1><a href="https://jan-iversen.de/2025/09/27/warum-leite-ich-zwei-ddkampagnen.html">Vom Spieler zum Spielleiter: Meine Reise mit D&amp;D</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/09/27/warum-leite-ich-zwei-ddkampagnen.html" class="u-url"><time class="dt-published" datetime="2025-09-27 09:13:15 &#43;0100">Sep 27, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/27/warum-leite-ich-zwei-ddkampagnen.html" class="u-url"><time class="dt-published" datetime="2025-09-27 10:13:15 &#43;0200">Sep 27, 2025</time></a>
 
 		<div class="e-content">
 			 <h1 id="worum-geht-es-hier">Worum geht es hier?</h1>
@@ -1356,7 +1541,7 @@ Du siehst, irgendwie mache ich in meiner Freizeit etwas sehr ähnliches wie im B
 	  <div class="h-entry">
 		
 
-		<a href="https://jan-iversen.de/2025/09/25/erstmal-kaffee-was-ist-das.html" class="u-url"><time class="dt-published" datetime="2025-09-25 05:56:53 &#43;0100">Sep 25, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/25/erstmal-kaffee-was-ist-das.html" class="u-url"><time class="dt-published" datetime="2025-09-25 06:56:53 &#43;0200">Sep 25, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Erstmal Kaffee&hellip;.</p>
@@ -1371,7 +1556,7 @@ Du siehst, irgendwie mache ich in meiner Freizeit etwas sehr ähnliches wie im B
 			<h1><a href="https://jan-iversen.de/2025/09/24/orgroamui-oder-wie-wurde-die.html">Org-Roam-UI... oder: Wie wurde die Notizvorschau repariert.</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/09/24/orgroamui-oder-wie-wurde-die.html" class="u-url"><time class="dt-published" datetime="2025-09-24 18:47:58 &#43;0100">Sep 24, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/24/orgroamui-oder-wie-wurde-die.html" class="u-url"><time class="dt-published" datetime="2025-09-24 19:47:58 &#43;0200">Sep 24, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Ich benutze Emacs. Unter anderem verwende ich es für die Planung, Vorbereitung und Nachbereitung meiner Pen&amp;Paper-Runde “Fluch des Strahd”. Diese Kampagne hat eine hohe Komplexität. Es gibt viele Non-Player-Charakters (NPC), Orte, Ereignisse und Geheimnisse, die mit einander zusammenhängen. Das Buch der Kampagne ist leider nicht besonders gut strukturiert. Beim ersten Lesen ist mir bereits aufgefallen, dass sehr viele Informationen z. B. zu NPCs über das gesamte Buch verstreut sind. Als Spielleiter benötige ich aber alle Informationen gebündelt. Nur so kann ich gezielt Hinweise einstreuen, die wichtig sind. Meine Aufgabe ist es, die Gruppe grundsätzlich einen Rahmen zu geben, in dem sie sich bewegen können. Und sie sollten auch genug Informationen haben, damit sie Entscheidungen treffen können. Ich weiß, dass kann kontrovers gesehen werden (Railroad vs. Sandbox…), aber so ist mein Stil. Und bisher scheinen meine Mitspieler das zu mögen.</p>
@@ -1425,7 +1610,7 @@ Du siehst, irgendwie mache ich in meiner Freizeit etwas sehr ähnliches wie im B
 			<h1><a href="https://jan-iversen.de/2025/09/22/warum-benutze-ich-emacs.html">Warum benutze ich Emacs?</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/09/22/warum-benutze-ich-emacs.html" class="u-url"><time class="dt-published" datetime="2025-09-22 17:34:59 &#43;0100">Sep 22, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/22/warum-benutze-ich-emacs.html" class="u-url"><time class="dt-published" datetime="2025-09-22 18:34:59 &#43;0200">Sep 22, 2025</time></a>
 
 		<div class="e-content">
 			 <p>Heute möchte ich ein wenig über Emacs schreiben. Für mich ist Emacs mittlerweile ein sehr wichtiges Werkzeug in meiner persönlichen aber auch beruflichen Organisation geworden. Im folgenden werde ich kurz beschreiben, wie ich als Nichtentwickler Emacs für mein Wissens- und Projektmanagement verwende? Wie nutze ich Emacs im Beruf und Privat?</p>
@@ -1502,7 +1687,7 @@ Also stell dir vielleicht diese beiden Fragen.</p>
 			<h1><a href="https://jan-iversen.de/2025/09/21/ein-gestndnis-ich-bin-distrohopper.html">Ein Geständnis: Ich bin Distrohopper</a></h1>
 		
 
-		<a href="https://jan-iversen.de/2025/09/21/ein-gestndnis-ich-bin-distrohopper.html" class="u-url"><time class="dt-published" datetime="2025-09-21 07:03:04 &#43;0100">Sep 21, 2025</time></a>
+		<a href="https://jan-iversen.de/2025/09/21/ein-gestndnis-ich-bin-distrohopper.html" class="u-url"><time class="dt-published" datetime="2025-09-21 08:03:04 &#43;0200">Sep 21, 2025</time></a>
 
 		<div class="e-content">
 			 <h1 id="was-ist-distrohopping">Was ist Distrohopping?</h1>
