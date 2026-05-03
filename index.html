@@ -24,6 +24,54 @@
 	
 	  <div class="h-entry">
 		
+			<h1><a href="https://jan-iversen.de/2026/05/01/einen-monat-opensuse-tumbleweed-slowroll.html">Einen Monat openSUSE Tumbleweed / Slowroll</a></h1>
+		
+
+		<a href="https://jan-iversen.de/2026/05/01/einen-monat-opensuse-tumbleweed-slowroll.html" class="u-url"><time class="dt-published" datetime="2026-05-01 07:55:05 &#43;0200">May 1, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Ende <a href="https://jan-iversen.de/2026/03/29/opensuse-tumbleweed-challenge.html">März</a> hatte ich mir selber die Challenge gesetzt, bei openSUSE Tumbleweed zu bleiben. Es sollte mich ein wenig von meiner Distrohopping-Sucht heilen. Nun&hellip; die Challenge habe ich fast geschafft. Ich habe lediglich zwischendurch auf Slowroll umgestellt. Aber lasst mich in Ruhe berichten.</p>
+<p>Die <a href="https://jan-iversen.de/2026/03/24/thinkpad-luft-jetzt-stabil.html">Probleme</a> mit der Wifi-Karte auf meinem Thinkpad habe ich erfolgreich gelöst. Seit der Umstellung auf iwd gab es keine Kernelpanics mehr. Also konnte ich mir in Ruhe anschauen, wie Tumbleweed sich über vier Wochen allgemein verhält. Kurz gesagt: Es gab keine Probleme.</p>
+<h2 id="updates">Updates</h2>
+<p>Tumbleweed ist ein Rolling-Release-System. Updates für die Pakete werden zeitnah bereitgestellt. Im Gegensatz zu Arch gibt es in Tumbleweed immer Snapshots, die veröffentlicht werden. In diesen Snapshots sind die Updates gebündelt. Dank der automatisierten Tests bei openSUSE ist sichergestellt, dass das System in seiner Gesamtheit auch nach dem Update funktioniert. Das bedeutet aber nicht, dass keine Bugs in den neuen Versionen der Pakete enthalten sein können. Soweit ich es verstehe, geht es bei den automatisierten Test eher darum, dass das Gesamtsystem weiterhin funktioniert (Bootet es? Kann eine grafische Oberfläche gestartet werden? Funktionieren die wichtigsten Programme? &hellip;). Während des Aprils gab es kein Update, welches bei mir ein Problem verursacht hat.</p>
+<p>Allerdings haben die Updates teilweise einen enormen Umfang gehabt. Es ist nicht ungewöhnlich gewesen, dass ich an zwei oder drei Tagen in einer Woche jeweils über ein Gigabyte an aktualisierten Paketen installieren durfte. Insbesondere das Update von LaTeX ist in diesen Zeitraum gefallen. Das ist nicht nur von der Größe her ein echter Brocken, auch die Anzahl der Pakete ist enorm. Und LaTeX wurde, wenn ich mich richtig erinnere, dreimal aktualisiert. Man muss sich also darauf einstellen, dass es oft große Updatepakete geben kann.</p>
+<p>Was aber sehr gut funktioniert, ist das Aussetzen eines oder mehrerer Updates. Ich habe auch einmal den Computer eine Woche nicht aktualisiert. Und ich habe noch ein älteres Thinkpad, das vier Wochen im Schrank lag und nicht benutzt wurde. Das war für Tumbleweed kein Problem. Ein <code>sudo zypper dup</code> hat auf beiden Geräten sehr gut funktioniert.</p>
+<p>Wenn man sich vorab über den Inhalt eines Updatepakets informieren möchte, dann kann ich folgende Seite empfehlen: <a href="https://victorhck.gitlab.io/tumbleweed_snapshots/">Tumbleweed snapshots</a>. Ich habe die Seite in meinem RSS-Aggregator abonniert. So kann ich mir vorab anschauen, was im Update enthalten ist.</p>
+<p>Sehr zu empfehlen ist in dem Hinblick auch der Blog von <a href="https://dominique.leuenberger.net/blog/">Dominique a.k.a. DimStar (Dim*) – A passionate openSUSE user</a>. Hier gibt es jede Woche ein Review mit den Highlights und eine Vorausschau auf die nächste Woche.</p>
+<h2 id="snapshots">Snapshots</h2>
+<p>Bei jedem Update legt openSUSE einen Snapshot an. Sollte ein Update also doch Probleme verursachen, kann ich beim Neustart des Rechners eine ältere Version starten. Der ältere Snapshot kann dann als aktuelles, produktives System wieder aktiviert werden. Wenn der Bug kritisch ist und viele Personen betreffen sollte, sind die Chancen gut, dass es schnell einen Fix gibt. So oder so&hellip; sollte ein Update einmal schiefgehen, ein Reboot und ich habe wieder ein funktionierendes System. Und das alles kommt out of the box.</p>
+<h2 id="softwareverfügbarkeit">Softwareverfügbarkeit</h2>
+<p>Im Repository ist sehr viel enthalten. Es gab einige Programme, die ich nicht gefunden habe und dann als Flatpak installiert habe. Bei mir sind das unter anderem Programme wie Discord, Element, Proton Mail Bridge oder Signal. Ich wollte da auch nicht mit RPM-Paketen arbeiten, die ich selber herunterladen und dann installieren muss. Entweder es ist im Repository von openSUSE, dann freue ich mich. Ansonsten wird es über Flatpak installiert. Ich habe damit kein Problem.</p>
+<h2 id="codecverfügbarkeit">Codecverfügbarkeit</h2>
+<p>Über Codecs hatte ich bereits Ende <a href="https://jan-iversen.de/2026/03/29/opensuse-tumbleweed-challenge.html">März</a> ebenfalls geschrieben. Ich bleibe bei meiner Entscheidung Firefox und VLC als Flatpak zu nutzen. Dadurch spare ich mir die evtl. auftretenden Probleme mit dem Packman-Repository.</p>
+<h2 id="community">Community</h2>
+<p>Ich lese viel im Subreddit r/openSUSE. Man merkt, dass die Community nicht besonders groß ist. Die Anzahl der Beiträge ist überschaubar und es werden sehr wenig Screenshots des Desktops gepostet. Die meisten Beiträge sind konkrete Probleme. Und es wird auch geholfen. Ich wünsche mir, jede Community wäre so unaufgeregt wie die openSUSE-Community. Ich bin auch in ein oder zwei Matrix-Kanälen von openSUSE stiller Leser. Und auch hier ist die Kommunikation angenehm, unaufgeregt und hilfsbereit. Wenn ich mir andere Foren, Discord-Kanäle oder Subreddits anschaue, dann bin ich froh openSUSE, aktuell zu nutzen. Übrigens, es gibt ein <a href="https://metrics.opensuse.org/d/osrt_access/osrt-access?orgId=1&amp;from=now-5y&amp;to=now&amp;timezone=browser&amp;var-frequency=month&amp;var-product=">Grafana-Dashboard</a> von openSUSE. Es werden die Zugriffe auf den Hauptmirror registriert. Daraus kann man grob ableiten, wie viele Benutzer es mindestens gibt. Für Tumbleweed pendelt es zwischen 240000 und 250000 Benutzern. Slowroll könnte vielleicht dieses Jahr die 6000 Benutzer knacken. Das sind aber nur die Installationen, die den Hauptmirror verwenden. Da es weitere Mirrorserver gibt, liegt die Anzahl der Benutzer mit Sicherheit höher.</p>
+<h2 id="der-wechsel-zu-slowroll">Der Wechsel zu Slowroll</h2>
+<p>Jetzt habe ich einige Male Slowroll erwähnt. Der Unterschied zu Tumbleweed liegt in der Anzahl der Updates. In Slowroll gibt es etwa alle vier Wochen (ich meine, dass es immer um den 9. eines Monats geschieht) ein großes Update. Darin sind dann die aktualisierten Pakete enthalten, die aus Tumbleweed gesammelt wurden. Während des Monats gibt es kleinere Updates, die primär Sicherheitslücken oder kritische Fehler beheben. Ich habe vor einer Woche meine Computer auf Slowroll umgestellt. Da mir die Updates von Tumbleweed dann doch etwas zu groß und zu viel waren, glaube ich für mich hier den richtigen Kompromiss gefunden zu haben. Slowroll ist sehr aktuell, aber eben nicht ganz so aktuell wie Arch oder Tumbleweed. Ich nenne Slowroll „entschleunigtes Rolling-Release“. Slowroll ist aktuell noch in der Beta-Phase. Ich merke davon aber nichts ☺️</p>
+<h2 id="gaming">Gaming</h2>
+<p>Aktuell spiele ich ab und zu Diablo 4 über Steam. Das Spiel funktioniert sehr gut unter openSUSE. Übrigens: X-Plane 12 funktioniert auch. Ich habe es aber nur kurz getestet. Andere Spiele habe ich in der Zeit nicht gespielt. Daher kann ich wenig zu Gaming allgemein sagen. Aber da Kernel, Mesa-Treiber und KDE Plasma immer sehr aktuell sind, steht aus meiner Sicht Gaming hier nichts im Wege.</p>
+<h2 id="mein-fazit">Mein Fazit</h2>
+<p>Ich finde openSUSE Tumbleweed bzw. Slowroll sehr gut. Das Konzept aus Rolling-Release zusammen mit den automatisierten Tests sowie den Snapshots gibt mir genug Sicherheit, dass ich diese Distribution nutze. Ist openSUSE für jeden etwas? Ich bin da zwiegespalten. Ein Anfänger könnte doch schnell überfordert sein. Man sollte schon ein wenig über Linux wissen und auch keine Scheu vor der Kommandozeile haben. Denn Systemupdates sollten zwingend über zypper eingespielt werden.</p>
+<p>Auf jeden Fall ist openSUSE Tumbleweed aber für jeden etwas, der ein Rolling-Release-System haben möchte aber vor Arch zurückschreckt. Bei openSUSE Tumbleweed bekommt man ein fertig eingerichtetes System. Man muss dann aber auch mit den Entscheidungen leben, die openSUSE für einen getroffen hat. Möchte man sein eigenes System aufbauen und selber die Entscheidungen treffen, dann ist Arch klar besser. Tumbleweed oder auch Slowroll müssen sich aber nicht verstecken. Und ich hoffe, dass diese Distribution bzw. das gesamte openSUSE-Projekt ein wenig mehr Aufmerksamkeit bekommt. Denn zur Zeit führt diese Distribution eher ein Schattendasein, welches nicht verdient ist.</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
+
+		<a href="https://jan-iversen.de/2026/04/30/spaziergang-durch-ein-rapsfeld-einfach.html" class="u-url"><time class="dt-published" datetime="2026-04-30 11:05:21 &#43;0200">Apr 30, 2026</time></a>
+
+		<div class="e-content">
+			 <p>Spaziergang durch ein Rapsfeld&hellip; einfach die Seele baumeln lassen.</p>
+<!-- raw HTML omitted -->
+
+		</div>
+	  </div>
+	
+	  <div class="h-entry">
+		
 			<h1><a href="https://jan-iversen.de/2026/04/30/emails-in-emacs-speziell-proton.html">Emails in Emacs (speziell Proton Mail)</a></h1>
 		
 
@@ -44,7 +92,7 @@
 <p>Wir benötigen aus der Bridge noch das Zertifikat für ein weiteres Programm. Das Zertifikat kann in den „advanced settings“ unter „Export TLS certificates“ exportiert werden. Ich habe das Zertifikat in meinem Mail Ordner gespeichert. Es kann aber auch an einem anderen Ort abgelegt werden. Wir müssen den Ort für die weiteren Sync-Programme in der Konfiguration angeben. Die Daten für den Imap- und SMTP-Server sowie das Passwort benötigen wir ebenfalls gleich.</p>
 <h2 id="pakete-für-sync-mu-etc-installieren">Pakete für Sync, Mu, etc installieren</h2>
 <p>Damit wir die Emails im <code>Mail</code>-Ordner synchronisieren, verwenden wir <strong><a href="https://isync.sourceforge.io/mbsync.html">mbsync</a></strong>. Für den Versand verwenden wir <strong><a href="https://marlam.de/msmtp/">msmtp</a></strong>. Und dann benötigen wir noch <strong>Mu</strong> und <strong>Mu4e</strong>. Unter Tumbleweed sind alle Pakete im Repository vorhanden und können wie folgt installiert werden:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">sudo zypper in isync msmtp maildir-utils w3m mu4e
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">sudo zypper in isync msmtp maildir-utils w3m mu4e
 </code></pre></div><h2 id="mbsync-einrichten">mbsync einrichten</h2>
 <p>mbsync erledigt für uns die Arbeit die Emails im Mail-Verzeichnis zu synchronisieren. Damit mbsync funktioniert, benötigt es die Informationen wie Zugangsdaten zu unserer Mail-Bridge (oder Imap), Zielordner, Zertifikat, etc. Für Proton habe ich bei mir folgende Konfiguration unter <code>~./mbsyncrc ~</code> angelegt.</p>
 <pre tabindex="0"><code class="language-conf" data-lang="conf"># 1. DER ZUGANG (Dein Proton-Konto in der Bridge)
@@ -132,41 +180,41 @@ account default : protonmail
 </code></pre><p>Auch msmtp benötigt den Ort des Zertifikats sowie die Zugangsdaten der Proton Mail Bridge.</p>
 <h2 id="konfiguration-in-emacs">Konfiguration in Emacs</h2>
 <p>Ich kopiere hier einfach meine Konfiguration. Das ist teilweise durch KI generiert oder übernommene Parameter aus anderen Blogs. Für mich funktioniert die Konfiguration so sehr gut.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-emacs-lisp" data-lang="emacs-lisp">  (use-package mu4e
-    :ensure <span style="color:#66d9ef">nil</span> <span style="color:#75715e">; Wir nutzen das Systempaket von openSUSE</span>
-    :config
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-lisp" data-lang="lisp">  (<span style="color:#a6e22e">use-package</span> mu4e
+    <span style="color:#e6db74">:ensure</span> <span style="color:#66d9ef">nil</span> <span style="color:#75715e">; Wir nutzen das Systempaket von openSUSE</span>
+    <span style="color:#e6db74">:config</span>
     <span style="color:#75715e">;; --- GRUNDLAGEN ---</span>
 
     <span style="color:#75715e">;; Sagt Emacs, wo dein Haupt-Mail-Ordner liegt.</span>
-    (setq mu4e-maildir <span style="color:#e6db74">&#34;~/Mail&#34;</span>)
+    (<span style="color:#66d9ef">setq</span> mu4e-maildir <span style="color:#e6db74">&#34;~/Mail&#34;</span>)
 
     <span style="color:#75715e">;; Intervall für Emailcheck</span>
-    (setq mu4e-update-interval <span style="color:#ae81ff">300</span>)
+    (<span style="color:#66d9ef">setq</span> mu4e-update-interval <span style="color:#ae81ff">300</span>)
 
     <span style="color:#75715e">;; Sent-Mails löschen</span>
-    (setq mu4e-sent-messages-behavior <span style="color:#e6db74">&#39;delete</span>)
+    (<span style="color:#66d9ef">setq</span> mu4e-sent-messages-behavior <span style="color:#e6db74">&#39;delete</span>)
 
     <span style="color:#75715e">;; --- DEINE IDENTITÄT ---</span>
 
-    (setq user-mail-address <span style="color:#e6db74">&#34;jan.iversen@proton.me&#34;</span>
-          <span style="color:#a6e22e">user-full-name</span> <span style="color:#e6db74">&#34;Jan Iversen&#34;</span>)
+    (<span style="color:#66d9ef">setq</span> user-mail-address <span style="color:#e6db74">&#34;jan.iversen@proton.me&#34;</span>
+          user-full-name <span style="color:#e6db74">&#34;Jan Iversen&#34;</span>)
 
     <span style="color:#75715e">;; --- ORDNER-STRUKTUR (Proton-Standard) ---</span>
 
     <span style="color:#75715e">;; Hier definieren wir, welche Ordner für was zuständig sind.</span>
     <span style="color:#75715e">;; Das &#34;mu4e-maildir-shortcuts&#34; erlaubt dir, mit &#39;j&#39; und </span>
     <span style="color:#75715e">;; dann dem Buchstaben (z.B. &#39;i&#39;) blitzschnell zu springen.</span>
-    (setq mu4e-maildir-shortcuts
-          <span style="color:#f92672">&#39;</span>((<span style="color:#e6db74">&#34;/INBOX&#34;</span>   <span style="color:#f92672">.</span> <span style="color:#e6db74">?i</span>)
-            (<span style="color:#e6db74">&#34;/Sent&#34;</span>    <span style="color:#f92672">.</span> <span style="color:#e6db74">?s</span>)
-            (<span style="color:#e6db74">&#34;/Trash&#34;</span>   <span style="color:#f92672">.</span> <span style="color:#e6db74">?t</span>)
-            (<span style="color:#e6db74">&#34;/Drafts&#34;</span>  <span style="color:#f92672">.</span> <span style="color:#e6db74">?d</span>)
-              (<span style="color:#e6db74">&#34;/Archive&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">?a</span>)))
+    (<span style="color:#66d9ef">setq</span> mu4e-maildir-shortcuts
+          <span style="color:#f92672">&#39;</span>((<span style="color:#e6db74">&#34;/INBOX&#34;</span>   <span style="color:#f92672">.</span> ?i)
+            (<span style="color:#e6db74">&#34;/Sent&#34;</span>    <span style="color:#f92672">.</span> ?s)
+            (<span style="color:#e6db74">&#34;/Trash&#34;</span>   <span style="color:#f92672">.</span> ?t)
+            (<span style="color:#e6db74">&#34;/Drafts&#34;</span>  <span style="color:#f92672">.</span> ?d)
+              (<span style="color:#e6db74">&#34;/Archive&#34;</span> <span style="color:#f92672">.</span> ?a)))
 
     <span style="color:#75715e">;; --- VERSAND (msmtp) ---</span>
 
     <span style="color:#75715e">;; Hier sagen wir Emacs, dass es msmtp zum Verschicken nutzen soll.</span>
-    (setq send-mail-function <span style="color:#e6db74">&#39;sendmail-send-it</span>
+    (<span style="color:#66d9ef">setq</span> send-mail-function <span style="color:#e6db74">&#39;sendmail-send-it</span>
           sendmail-program <span style="color:#e6db74">&#34;/usr/bin/msmtp&#34;</span>
           message-sendmail-f-is-evil <span style="color:#66d9ef">t</span>
           message-sendmail-extra-arguments <span style="color:#f92672">&#39;</span>(<span style="color:#e6db74">&#34;--read-envelope-from&#34;</span>))
@@ -174,27 +222,28 @@ account default : protonmail
     <span style="color:#75715e">;; --- KOMFORT ---</span>
 
     <span style="color:#75715e">;; Bilder direkt in der Mail anzeigen (schön auf deinem Ultrawide!)</span>
-    (setq mu4e-view-show-images <span style="color:#66d9ef">t</span>)
+    (<span style="color:#66d9ef">setq</span> mu4e-view-show-images <span style="color:#66d9ef">t</span>)
 
     <span style="color:#75715e">;; HTML-Mails schick im Emacs-Puffer anzeigen</span>
-    (setq mu4e-html2text-command <span style="color:#e6db74">&#34;w3m -T text/html&#34;</span>))
+    (<span style="color:#66d9ef">setq</span> mu4e-html2text-command <span style="color:#e6db74">&#34;w3m -T text/html&#34;</span>))
 
   <span style="color:#75715e">;; Anzahl ungelesene Emails in Modeline anzeigen</span>
   (mu4e-modeline-mode <span style="color:#ae81ff">1</span>)
-  (add-hook <span style="color:#e6db74">&#39;mu4e-index-updated-hook</span> <span style="color:#a6e22e">#&#39;force-mode-line-update</span>)
-  (setq mu4e-sent-folder   <span style="color:#e6db74">&#34;/Sent&#34;</span>
+  (add-hook <span style="color:#e6db74">&#39;mu4e-index-updated-hook</span> <span style="color:#a6e22e">#&#39;</span>force-mode-line-update)
+  (<span style="color:#66d9ef">setq</span> mu4e-sent-folder   <span style="color:#e6db74">&#34;/Sent&#34;</span>
       mu4e-drafts-folder <span style="color:#e6db74">&#34;/Drafts&#34;</span>
       mu4e-trash-folder  <span style="color:#e6db74">&#34;/Trash&#34;</span>
       mu4e-refile-folder <span style="color:#e6db74">&#34;/Archive&#34;</span>)
 <span style="color:#75715e">;; Proton ist zickig beim Löschen</span>
-(setq mu4e-change-filenames-when-moving <span style="color:#66d9ef">t</span>)
-(setq mu4e-trash-without-flag <span style="color:#66d9ef">t</span>)
-(setq mu4e-headers-leave-behavior <span style="color:#e6db74">&#39;apply</span>)
+(<span style="color:#66d9ef">setq</span> mu4e-change-filenames-when-moving <span style="color:#66d9ef">t</span>)
+(<span style="color:#66d9ef">setq</span> mu4e-trash-without-flag <span style="color:#66d9ef">t</span>)
+(<span style="color:#66d9ef">setq</span> mu4e-headers-leave-behavior <span style="color:#e6db74">&#39;apply</span>)
 </code></pre></div><p>Wichtig sind die letzten drei Parameter für Proton. Ich verstehe nicht genau, was eigentlich im Hintergrund geschieht. Aber wenn alles so konfiguriert ist, funktioniert das „Löschen“, also Verschieben einer Email in Trash, zuverlässig.</p>
 <h2 id="abschluss">Abschluss</h2>
 <p>Wenn alles eingerichtet ist, Emacs einmal neu starten. Über Alt+x mu4e starten und sich (hoffentlich) freuen, dass Emails im Dashboard angezeigt werden. Ab da verweise ich dann auf die Dokumentation für mu4e für die Bedienung. Am besten den Versand einer Email einmal testen und prüfen, ob alles korrekt ankommt. Bei mir hat es (bis auf das Löschen von Mails) sofort funktioniert. Und teste dann einmal die Suche, wenn alle Emails synchronisiert sind.</p>
 <h1 id="fazit">Fazit</h1>
 <p>Für mich funktioniert die Emailverwaltung in Emacs wunderbar. Es ist rasend schnell. HTML-Emails werden auch gut dargestellt und sind sogar entspannter zu lesen. Emacs bereinigt quasi die HTML-Mails und man kann sich auf den Inhalt konzentrieren. Wenn Emacs geschlossen ist, läuft dennoch der Sync und die Indizierung. Dadurch sind lokal alle Daten aktuell. Der einzige „Wermutstropfen“&hellip; es kann durch die Intervalle durchaus einige Minuten dauern, bis in Emacs eine Email angezeigt wird. Ich kann damit leben. Falls mal ein 2FA-Code per Email gesendet wird, den ich wirklich sofort benötige, schaue ich entweder auf das Smartphone oder stoße den Sync kurz manuell an. Aber wie oft kommt das wirklich vor. Mich entschleunigt das Lesen der Emails in Emacs sehr. Und ich kann jetzt Emails mit TODOs in orgmode verknüpfen.</p>
+<!-- raw HTML omitted -->
 <h1 id="links">Links</h1>
 <ul>
 <li><a href="https://flathub.org/de/apps/ch.protonmail.protonmail-bridge">Proton Mail Bridge in Flathub</a></li>
