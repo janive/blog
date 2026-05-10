@@ -7,6 +7,14 @@
 	"items": [
 		
 			{
+				"id": "http://razorback.micro.blog/2026/05/10/der-umbau-des-blogs-luft.html",
+				
+				"content_html": "<p>Der Umbau des Blogs läuft&hellip; sieht bisher sehr gut aus. Vielleicht wird also in ein paar Tagen umgestellt.</p>\n<!-- raw HTML omitted -->\n",
+				"content_text": "Der Umbau des Blogs läuft... sieht bisher sehr gut aus. Vielleicht wird also in ein paar Tagen umgestellt.\n\n<img src=\"uploads/2026/5ff246d5ff.png\" alt=\"\">\n",
+				"date_published": "2026-05-10T20:20:29+02:00",
+				"url": "https://jan-iversen.de/2026/05/10/der-umbau-des-blogs-luft.html"
+			},
+			{
 				"id": "http://razorback.micro.blog/2026/05/06/blogumzug.html",
 				"title": "Blog-Umzug?",
 				"content_html": "<p>Ich habe eine verrückte Idee&hellip;</p>\n<p>aktuell nutze ich den Dienstleister micro.blog für diesen Blog. Ich bin auch sehr zufrieden. Aber wenn ich in Emacs direkt Blogeinträge schreibe, warum kann ich nicht auch direkt aus Emacs heraus dann alles exportieren und direkt auf einen Server laden? Ich arbeite gerade den Projektplan dafür aus. Natürlich wird das in einer separaten Org-Datei vorbereitet.</p>\n<p>Wenn mein Plan klappt und ich mit dem Ergebnis lokal zufrieden bin, dann ist der Blog evtl. für einen Tag nicht erreichbar. Und wird dann optisch vielleicht ein wenig anders aussehen.</p>\n<p>Übrigens&hellip; ich plane meine Projekte egal ob beruflich oder privat immer so.</p>\n<!-- raw HTML omitted -->\n",
